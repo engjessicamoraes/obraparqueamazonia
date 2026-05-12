@@ -339,6 +339,7 @@ body{font-family:var(--fn);background:var(--bg);color:var(--tx);font-size:14px;}
     <button class="nb" onclick="S('tl',this)"><i class="ti ti-timeline"></i>Histórico</button>
     <button class="nb" onclick="S('com',this)"><i class="ti ti-bell"></i>Comunicados</button>
     <button class="nb" onclick="S('gal',this)"><i class="ti ti-photo"></i>Galeria</button>
+    <button class="nb" onclick="S('admin',this)" style="opacity:.35;" title="Painel administrativo"><i class="ti ti-settings"></i></button>
   </div>
 </nav>
 
@@ -545,9 +546,6 @@ body{font-family:var(--fn);background:var(--bg);color:var(--tx);font-size:14px;}
       <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.978-1.413A9.953 9.953 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18.182a8.18 8.18 0 0 1-4.168-1.138l-.299-.178-3.093.877.877-3.094-.195-.308A8.182 8.182 0 1 1 12 20.182z"/></svg>
       FALAR COM A ENGENHEIRA
     </button>
-    <button onclick="S('admin',null)" style="display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px;background:transparent;border:1px solid var(--bd);border-radius:7px;cursor:pointer;margin-top:10px;color:var(--mt);transition:all .2s;" title="Painel de atualização" onmouseover="this.style.borderColor='var(--M)';this.style.color='var(--M)'" onmouseout="this.style.borderColor='var(--bd)';this.style.color='var(--mt)'">
-      <i class="ti ti-settings" style="font-size:16px;"></i>
-    </button>
   </div>
 </footer>
 
@@ -565,6 +563,36 @@ body{font-family:var(--fn);background:var(--bg);color:var(--tx);font-size:14px;}
 </div>
 
 </div><!-- /wrap -->
+
+<!-- FIREBASE SDK -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getDatabase, ref, set, get, onValue } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCGn_EMCiMMPda0J2yXQPPiLRSQ7QNsXNA",
+  authDomain: "obra-parque-ia.firebaseapp.com",
+  databaseURL: "https://obra-parque-ia-default-rtdb.firebaseio.com",
+  projectId: "obra-parque-ia",
+  storageBucket: "obra-parque-ia.firebasestorage.app",
+  messagingSenderId: "1094695136084",
+  appId: "1:1094695136084:web:97abdd6f82df5ed749b6c1"
+};
+
+const app = initializeApp(firebaseConfig);
+const db  = getDatabase(app);
+
+// Expõe funções para o script principal
+window._fbSalvar = async function(dados) {
+  await set(ref(db, 'obra'), dados);
+};
+
+window._fbCarregar = function(callback) {
+  onValue(ref(db, 'obra'), snap => {
+    if(snap.exists()) callback(snap.val());
+  });
+};
+</script>
 
 <script>
 // ============================================================
@@ -893,9 +921,22 @@ function renderAdminTable(){
     <td><select class="st-sel" id="inp-st-${i}">${ST_OPTS.map(o=>`<option value="${o}"${b.st===o?' selected':''}>${SL[o]}</option>`).join('')}</select></td></tr>`
   ).join('');
 }
+function salvarFirebase(){
+  if(!window._fbSalvar) return;
+  const dados = {
+    BLOCOS_ST: BLOCOS.map(b=>({pct:b.pct||0, st:b.st})),
+    MED: MED,
+    CAL_MANUAL: CAL_MANUAL,
+    COMS: COMS,
+    FOTOS: FOTOS,
+  };
+  window._fbSalvar(dados).catch(e=>console.warn('Firebase erro:',e));
+}
+
 function saveStatus(){
   BLOCOS.forEach((b,i)=>{ b.st=document.getElementById('inp-st-'+i).value; });
   rDash(); rBlocos(); rCrono();
+  salvarFirebase();
   const m=document.getElementById('sv-status-msg');
   m.textContent='✓ STATUS ATUALIZADO — '+new Date().toLocaleTimeString('pt-BR');
   m.style.color='var(--ok)';
@@ -959,6 +1000,7 @@ function saveMed(){
     }
   });
   rDash(); rBlocos(); rCrono();
+  salvarFirebase();
   const m=document.getElementById('sv-med-msg');
   m.textContent='✓ MEDIÇÕES DO BLOCO '+(bi+1)+' ATUALIZADAS — '+new Date().toLocaleTimeString('pt-BR');
   m.style.color='var(--ok)';
@@ -981,9 +1023,9 @@ function addFoto(){
   document.getElementById('foto-leg').value='';
   msg.textContent='✓ FOTO ADICIONADA À GALERIA.'; msg.style.color='var(--ok)';
   setTimeout(()=>{msg.textContent='';},3000);
-  renderFotoLista(); rGal();
+  renderFotoLista(); rGal(); salvarFirebase();
 }
-function delFoto(i){ FOTOS.splice(i,1); renderFotoLista(); rGal(); }
+function delFoto(i){ FOTOS.splice(i,1); renderFotoLista(); rGal(); salvarFirebase(); }
 function renderFotoLista(){
   document.getElementById('foto-count').textContent=FOTOS.length;
   const lista=document.getElementById('foto-lista');
@@ -999,7 +1041,7 @@ function addC(){
   const m=document.getElementById('c-msg');
   if(!h||!p){ m.textContent='Preencha o título e o texto.'; m.style.color='var(--err)'; return; }
   COMS.unshift({t,d:new Date().toLocaleDateString('pt-BR'),h,p});
-  rCom();
+  rCom(); salvarFirebase();
   document.getElementById('c-tit').value=''; document.getElementById('c-txt').value='';
   m.textContent='✓ COMUNICADO PUBLICADO.'; m.style.color='var(--ok)';
   setTimeout(()=>{m.textContent='';},3500);
@@ -1095,7 +1137,7 @@ function calToggle(ds){
   if(!atual)                        CAL_MANUAL[ds] = 'trabalhado';
   else if(atual==='trabalhado')     CAL_MANUAL[ds] = 'nao_trabalhado';
   else                              delete CAL_MANUAL[ds];
-  rCal();
+  rCal(); salvarFirebase();
 }
 
 function rCalIndicadores(){
@@ -1283,6 +1325,20 @@ function initQR(){
 }
 
 rDash(); rBlocos(); rCrono(); rTL(); rCom(); rGal(); rCal(); initQR();
+
+// Carrega dados salvos do Firebase ao abrir o site
+window.addEventListener('load', ()=>{
+  if(window._fbCarregar){
+    window._fbCarregar(dados => {
+      if(dados.BLOCOS_ST) dados.BLOCOS_ST.forEach((s,i)=>{ if(BLOCOS[i]){ BLOCOS[i].pct=s.pct||0; BLOCOS[i].st=s.st||BLOCOS[i].st; } });
+      if(dados.MED) dados.MED.forEach((bloco,bi)=>{ if(bloco) bloco.forEach((et,ei)=>{ if(MED[bi]&&MED[bi][ei]&&et) Object.assign(MED[bi][ei],et); }); });
+      if(dados.CAL_MANUAL) Object.assign(CAL_MANUAL, dados.CAL_MANUAL);
+      if(dados.COMS && dados.COMS.length){ COMS.length=0; dados.COMS.forEach(c=>COMS.push(c)); }
+      if(dados.FOTOS && dados.FOTOS.length){ FOTOS.length=0; dados.FOTOS.forEach(f=>FOTOS.push(f)); }
+      rDash(); rBlocos(); rCrono(); rCom(); rGal(); rCal();
+    });
+  }
+});
 </script>
 </body>
 </html>
