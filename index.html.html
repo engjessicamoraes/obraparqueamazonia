@@ -1,0 +1,1290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal de Obra — Condomínio Parque Amazônia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --M:#5C2444;--ML:#7a305c;--MP:#f9f2f5;--MB:#e8d0db;
+  --G:#837546;--GP:#faf8f2;--GB:#e5dfc8;
+  --ok:#2d7a3a;--ok-bg:#edf7ef;--ok-b:#b8dfc0;
+  --wip:#b96a00;--wip-bg:#fff8ed;--wip-b:#fcd9a0;
+  --pend:#78716c;--pend-bg:#f5f4f2;--pend-b:#d8d4cf;
+  --err:#b91c1c;--err-bg:#fef2f2;--err-b:#fca5a5;
+  --wait:#5b21b6;--wait-bg:#f5f3ff;--wait-b:#c4b5fd;
+  --bg:#f9f7f5;--card:#fff;--bd:#e8e4de;
+  --tx:#1c1917;--mt:#78716c;--fn:'Inter',sans-serif;
+}
+body{font-family:var(--fn);background:var(--bg);color:var(--tx);font-size:14px;}
+.wrap{max-width:980px;margin:0 auto;padding-bottom:60px;}
+
+/* HEADER */
+.hdr{background:var(--M);color:#fff;padding:20px 24px 16px;position:relative;overflow:hidden;}
+.hdr::after{content:'';position:absolute;bottom:-28px;right:-28px;width:140px;height:140px;border-radius:50%;background:rgba(131,117,70,.22);}
+.hdr-top{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.hdr-left{display:flex;align-items:center;gap:12px;}
+.hdr-ico{width:42px;height:42px;border-radius:8px;background:rgba(131,117,70,.35);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.hdr-h1{font-size:17px;font-weight:600;letter-spacing:.3px;}
+.hdr-s{font-size:11px;opacity:.7;margin-top:2px;letter-spacing:.2px;}
+.hdr-r{text-align:right;font-size:11px;opacity:.75;}
+.hdr-r strong{display:block;font-size:13px;color:#e8d9a0;margin-bottom:2px;}
+.live{display:inline-flex;align-items:center;gap:5px;background:rgba(45,122,58,.28);color:#86efac;border:1px solid rgba(134,239,172,.3);border-radius:20px;padding:3px 9px;font-size:11px;margin-top:6px;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:#86efac;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+.hdr-desc{font-size:11.5px;opacity:.6;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,.12);line-height:1.6;letter-spacing:.1px;}
+
+/* HORÁRIO */
+.hbar{background:#4a1b36;color:#fff;padding:7px 24px;display:flex;align-items:center;gap:8px;font-size:12px;flex-wrap:wrap;}
+.hbar span{opacity:.5;}
+.hbar strong{color:#e8d9a0;letter-spacing:.3px;}
+.hbar-sep{opacity:.3;margin:0 2px;}
+
+/* NAV */
+.nav{background:#fff;border-bottom:1px solid var(--bd);padding:0 16px;display:flex;align-items:center;overflow-x:auto;position:sticky;top:0;z-index:100;}
+.nav-tabs{display:flex;flex:1;}
+.nb{padding:11px 12px;font-size:11.5px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;color:var(--mt);border:none;background:none;cursor:pointer;border-bottom:2.5px solid transparent;white-space:nowrap;transition:all .2s;font-family:var(--fn);}
+.nb.on,.nb:hover{color:var(--M);border-bottom-color:var(--M);}
+.nb i{font-size:13px;vertical-align:-2px;margin-right:4px;}
+.nav-wa{display:flex;align-items:center;gap:7px;background:#25d366;color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:11.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;font-family:var(--fn);cursor:pointer;flex-shrink:0;margin-left:10px;white-space:nowrap;transition:background .2s;}
+.nav-wa:hover{background:#1db954;}
+.nav-wa svg{width:16px;height:16px;fill:#fff;flex-shrink:0;}
+
+/* SECTIONS */
+.sec{display:none;padding:20px 24px;}
+.sec.on{display:block;}
+.st{font-size:15px;font-weight:600;margin-bottom:3px;letter-spacing:.1px;}
+.ss{font-size:12px;color:var(--mt);margin-bottom:16px;}
+
+/* KPI */
+.kpi-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:9px;margin-bottom:18px;}
+.kpi{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:13px;}
+.kpi.m{border-left:3px solid var(--M);}
+.kpi.g{border-left:3px solid var(--G);}
+.kpi.ok{border-left:3px solid var(--ok);}
+.kpi-l{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--mt);}
+.kpi-v{font-size:23px;font-weight:600;line-height:1.2;margin-top:4px;}
+.kpi-h{font-size:11px;color:var(--mt);margin-top:1px;}
+
+/* RING */
+.gpc{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:18px 20px;margin-bottom:18px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;}
+.gpc-ring{position:relative;width:88px;height:88px;flex-shrink:0;}
+.gpc-ring svg{transform:rotate(-90deg);}
+.gpc-n{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;line-height:1;}
+.gpc-n span{font-size:18px;font-weight:600;}
+.gpc-n small{display:block;font-size:10px;color:var(--mt);margin-top:2px;text-transform:uppercase;letter-spacing:.4px;}
+.gpc-rows{flex:1;min-width:160px;display:flex;flex-direction:column;gap:7px;}
+.gr{display:flex;align-items:center;gap:8px;}
+.gr-l{font-size:11px;color:var(--mt);min-width:86px;text-transform:uppercase;letter-spacing:.3px;font-weight:500;}
+.gr-t{flex:1;height:6px;background:var(--bg);border-radius:3px;overflow:hidden;}
+.gr-f{height:100%;border-radius:3px;transition:width .9s ease;}
+
+/* PILLS */
+.pill{font-size:10px;font-weight:700;padding:2.5px 8px;border-radius:20px;white-space:nowrap;letter-spacing:.3px;text-transform:uppercase;}
+.p-ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-b);}
+.p-wip{background:var(--wip-bg);color:var(--wip);border:1px solid var(--wip-b);}
+.p-pend{background:var(--pend-bg);color:var(--pend);border:1px solid var(--pend-b);}
+.p-err{background:var(--err-bg);color:var(--err);border:1px solid var(--err-b);}
+.p-wait{background:var(--wait-bg);color:var(--wait);border:1px solid var(--wait-b);}
+
+/* PROGRESS */
+.pt{height:5px;background:var(--bg);border-radius:3px;overflow:hidden;}
+.pf{height:100%;border-radius:3px;transition:width .8s ease;}
+.f-ok{background:var(--ok);}
+.f-wip{background:var(--wip);}
+.f-M{background:var(--M);}
+.f-G{background:var(--G);}
+
+/* BLOCOS */
+.bl-card{background:#fff;border:1px solid var(--bd);border-radius:12px;overflow:hidden;margin-bottom:12px;}
+.bl-head{padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;user-select:none;}
+.bl-head:hover{background:var(--MP);}
+.bl-num{width:36px;height:36px;border-radius:8px;background:var(--M);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;letter-spacing:.2px;}
+.bl-info{flex:1;}
+.bl-nome{font-size:13px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;}
+.bl-vg{font-size:11px;color:var(--mt);margin-top:2px;}
+.bl-r{display:flex;align-items:center;gap:9px;flex-shrink:0;flex-wrap:wrap;}
+.bl-pct{font-size:18px;font-weight:600;}
+.bl-prog{padding:0 16px 4px;}
+
+/* ETAPAS */
+.etapas{padding:0 16px 16px;}
+.et-header{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--mt);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--bd);}
+.et-row{margin-bottom:12px;padding:10px 12px;background:var(--bg);border-radius:8px;}
+.et-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;gap:8px;flex-wrap:wrap;}
+.et-num{font-size:10px;font-weight:700;color:var(--M);background:var(--MP);border-radius:4px;padding:2px 6px;letter-spacing:.3px;flex-shrink:0;margin-top:1px;}
+.et-nome{font-size:12.5px;font-weight:500;flex:1;}
+.et-right{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+.et-medida{font-size:11px;color:var(--mt);font-weight:500;}
+.et-pct{font-size:12px;font-weight:700;}
+.et-bar{height:6px;background:#e8e4de;border-radius:3px;overflow:hidden;margin-top:2px;}
+.et-fill{height:100%;border-radius:3px;transition:width .8s ease;}
+.et-valores{display:flex;gap:12px;margin-top:5px;flex-wrap:wrap;}
+.et-val{font-size:11px;color:var(--mt);}
+.et-val strong{color:var(--tx);font-weight:600;}
+/* etapa de status simples (canteiro) */
+.et-status-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--bg);border-radius:8px;margin-bottom:12px;}
+
+/* CRONOGRAMA */
+.crono-wrap{background:#fff;border:1px solid var(--bd);border-radius:10px;overflow:hidden;overflow-x:auto;}
+.ct{width:100%;border-collapse:collapse;font-size:12.5px;}
+.ct th{text-align:left;padding:9px 12px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--mt);background:#faf9f7;border-bottom:1px solid var(--bd);}
+.ct td{padding:9px 12px;border-bottom:1px solid var(--bd);vertical-align:middle;}
+.ct tr:last-child td{border-bottom:none;}
+.ct tr:hover td{background:#faf9f7;}
+
+/* COMUNICADOS */
+.cc{background:#fff;border:1px solid var(--bd);border-left:4px solid;border-radius:10px;padding:13px 15px;margin-bottom:10px;}
+.cc.info{border-left-color:var(--M);}
+.cc.warn{border-left-color:var(--wip);}
+.cc.ok{border-left-color:var(--ok);}
+.cc-meta{display:flex;gap:8px;align-items:center;margin-bottom:5px;flex-wrap:wrap;}
+.cc-dt{font-size:11px;color:var(--mt);}
+.cc-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:.3px;}
+.cc-h{font-size:13px;font-weight:600;margin-bottom:3px;}
+.cc-p{font-size:12px;color:var(--mt);line-height:1.55;}
+
+/* TIMELINE */
+.tl{position:relative;padding-left:22px;}
+.tl::before{content:'';position:absolute;left:6px;top:0;bottom:0;width:2px;background:var(--bd);}
+.tl-i{position:relative;margin-bottom:18px;}
+.tl-d{position:absolute;left:-19px;top:3px;width:13px;height:13px;border-radius:50%;border:2px solid var(--bg);}
+.tl-d.done{background:var(--ok);}
+.tl-d.wip{background:var(--G);}
+.tl-d.fut{background:var(--bd);}
+.tl-dt{font-size:10.5px;color:var(--mt);font-weight:600;text-transform:uppercase;letter-spacing:.4px;}
+.tl-h{font-size:13px;font-weight:500;margin:2px 0;}
+.tl-p{font-size:12px;color:var(--mt);}
+
+/* GALERIA */
+.gal-filtros{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.gal-sel{padding:8px 12px;border:1px solid var(--bd);border-radius:7px;font-size:13px;font-family:var(--fn);background:#fff;cursor:pointer;flex:1;min-width:140px;}
+.gal-sel:focus{outline:none;border-color:var(--M);}
+.gal-empty{background:white;border:1px solid var(--bd);border-radius:10px;padding:40px 24px;text-align:center;color:var(--mt);}
+.gal-empty i{font-size:36px;color:var(--MB);display:block;margin-bottom:10px;}
+.gal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;}
+.gi{border-radius:10px;border:1px solid var(--bd);overflow:hidden;background:#fff;cursor:pointer;transition:box-shadow .2s;}
+.gi:hover{box-shadow:0 4px 12px rgba(92,36,68,.12);}
+.gi img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;}
+.gi-ph{width:100%;aspect-ratio:4/3;background:#f0ece6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;}
+.gi-ph i{font-size:22px;color:#c4b9ae;}
+.gi-cap{padding:9px 10px;}
+.gi-bloco{font-size:10px;color:var(--M);font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
+.gi-fase{font-size:12px;font-weight:500;margin:2px 0;}
+.gi-leg{font-size:11px;color:var(--mt);}
+.gi-dt{font-size:10.5px;color:var(--mt);margin-top:2px;}
+
+/* LIGHTBOX */
+.lb{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:9999;display:none;align-items:center;justify-content:center;padding:20px;}
+.lb.on{display:flex;}
+.lb-inner{position:relative;max-width:900px;width:100%;background:#fff;border-radius:12px;overflow:hidden;}
+.lb img{width:100%;max-height:70vh;object-fit:contain;background:#111;display:block;}
+.lb-cap{padding:14px 16px;display:flex;justify-content:space-between;align-items:center;}
+.lb-info strong{display:block;font-size:14px;font-weight:600;}
+.lb-info span{font-size:12px;color:var(--mt);}
+.lb-close{background:none;border:none;cursor:pointer;font-size:22px;color:var(--mt);padding:4px;}
+.lb-close:hover{color:var(--M);}
+.lb-nav{position:absolute;top:50%;transform:translateY(-50%);background:rgba(255,255,255,.9);border:none;border-radius:50%;width:38px;height:38px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.lb-prev{left:10px;}
+.lb-next{right:10px;}
+.lb-nav:hover{background:#fff;color:var(--M);}
+
+/* RODAPÉ */
+.footer{background:#fff;border-top:1px solid var(--bd);padding:28px 24px;display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap;margin-top:20px;}
+.footer-qr{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;flex-shrink:0;}
+.footer-qr-box{padding:10px;background:#fff;border:1px solid var(--bd);border-radius:10px;}
+.footer-info{flex:1;min-width:220px;}
+.footer-brand{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.footer-brand-ico{width:36px;height:36px;background:var(--M);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.footer-brand-name{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;}
+.footer-brand-sub{font-size:11px;color:var(--mt);}
+.footer-details{font-size:12px;color:var(--mt);line-height:1.8;}
+.footer-wa{display:inline-flex;align-items:center;gap:7px;background:#25d366;color:#fff;border-radius:7px;padding:9px 16px;font-size:11.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-top:12px;border:none;cursor:pointer;font-family:var(--fn);}
+.footer-wa:hover{background:#1db954;}
+.footer-wa svg{width:16px;height:16px;fill:#fff;}
+
+/* ADMIN */
+.ag{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:24px;text-align:center;max-width:420px;margin:0 auto;}
+.ag h3{font-size:15px;font-weight:600;margin-bottom:6px;}
+.ag p{font-size:12px;color:var(--mt);margin-bottom:16px;}
+.ai{width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:7px;font-size:14px;font-family:var(--fn);text-align:center;margin-bottom:10px;}
+.ai:focus{outline:none;border-color:var(--M);}
+.btn-M{width:100%;padding:11px;background:var(--M);color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:600;font-family:var(--fn);cursor:pointer;text-transform:uppercase;letter-spacing:.4px;}
+.btn-M:hover{background:var(--ML);}
+.ap{display:none;}
+.ap.on{display:block;}
+.as{background:#fff;border:1px solid var(--bd);border-radius:10px;padding:20px;margin-bottom:14px;}
+.as-title{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;color:var(--M);display:flex;align-items:center;gap:6px;}
+.as-sub{font-size:12px;color:var(--mt);margin-bottom:16px;line-height:1.55;}
+.admin-table{width:100%;border-collapse:collapse;}
+.admin-table th{text-align:left;padding:8px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mt);background:#faf9f7;border-bottom:1px solid var(--bd);}
+.admin-table td{padding:10px;border-bottom:1px solid var(--bd);vertical-align:middle;}
+.admin-table tr:last-child td{border-bottom:none;}
+.admin-table tr:hover td{background:#faf9f7;}
+.pct-inp{width:74px;padding:7px 10px;border:1.5px solid var(--bd);border-radius:6px;font-size:14px;font-weight:600;font-family:var(--fn);text-align:center;}
+.pct-inp:focus{outline:none;border-color:var(--M);}
+.st-sel{padding:7px 8px;border:1.5px solid var(--bd);border-radius:6px;font-size:12px;font-family:var(--fn);background:#fff;cursor:pointer;min-width:130px;}
+.st-sel:focus{outline:none;border-color:var(--M);}
+.btn-sv{padding:11px 20px;background:var(--M);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;font-family:var(--fn);cursor:pointer;margin-top:16px;width:100%;}
+.btn-sv:hover{background:var(--ML);}
+.sv-msg{font-size:13px;color:var(--ok);text-align:center;margin-top:10px;min-height:18px;font-weight:600;}
+.asel{width:100%;padding:9px 12px;border:1.5px solid var(--bd);border-radius:8px;font-size:13px;font-family:var(--fn);background:#fff;margin-bottom:14px;cursor:pointer;}
+.asel:focus{outline:none;border-color:var(--M);}
+
+/* ADMIN MEDIÇÕES */
+.med-bloco-card{background:var(--bg);border-radius:10px;padding:14px;margin-bottom:8px;}
+.med-bloco-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--M);margin-bottom:10px;}
+.med-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--bd);flex-wrap:wrap;}
+.med-row:last-child{border-bottom:none;}
+.med-nome{flex:1;font-size:12px;min-width:200px;}
+.med-unit{font-size:11px;color:var(--G);font-weight:600;min-width:28px;}
+.med-inp{width:74px;padding:6px 8px;border:1.5px solid var(--bd);border-radius:6px;font-size:13px;font-weight:600;font-family:var(--fn);text-align:center;}
+.med-inp:focus{outline:none;border-color:var(--M);}
+.med-sep{font-size:12px;color:var(--mt);}
+.med-status-sel{padding:6px 8px;border:1.5px solid var(--bd);border-radius:6px;font-size:12px;font-family:var(--fn);background:#fff;cursor:pointer;}
+.med-status-sel:focus{outline:none;border-color:var(--M);}
+
+/* ADMIN FOTOS */
+.foto-ajuda{background:var(--GP);border:1px solid var(--GB);border-radius:8px;padding:12px 14px;font-size:12px;color:#5a4a28;margin-bottom:14px;line-height:1.6;}
+.foto-ajuda strong{display:block;margin-bottom:4px;color:var(--G);font-size:11px;text-transform:uppercase;letter-spacing:.4px;}
+.foto-form{background:var(--bg);border-radius:10px;padding:14px;margin-bottom:14px;}
+.foto-form-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;}
+.foto-inp{flex:1;min-width:180px;padding:9px 12px;border:1.5px solid var(--bd);border-radius:7px;font-size:13px;font-family:var(--fn);background:#fff;}
+.foto-inp:focus{outline:none;border-color:var(--M);}
+.foto-sel{padding:9px 12px;border:1.5px solid var(--bd);border-radius:7px;font-size:13px;font-family:var(--fn);background:#fff;cursor:pointer;}
+.foto-sel:focus{outline:none;border-color:var(--M);}
+.btn-add{padding:9px 16px;background:var(--M);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;font-family:var(--fn);cursor:pointer;white-space:nowrap;}
+.btn-add:hover{background:var(--ML);}
+.foto-lista{display:flex;flex-direction:column;gap:8px;}
+.foto-item{background:#fff;border:1px solid var(--bd);border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.foto-item img{width:56px;height:42px;object-fit:cover;border-radius:5px;flex-shrink:0;border:1px solid var(--bd);}
+.foto-item-info{flex:1;min-width:120px;}
+.foto-item-bloco{font-size:10px;color:var(--M);font-weight:700;text-transform:uppercase;letter-spacing:.4px;}
+.foto-item-fase{font-size:12.5px;font-weight:500;}
+.foto-item-leg{font-size:11px;color:var(--mt);}
+.btn-del{background:none;border:none;cursor:pointer;color:var(--err);font-size:16px;padding:4px;flex-shrink:0;}
+
+/* CALENDÁRIO */
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:4px;}
+.cal-dow{text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mt);padding:6px 0;}
+.cal-dia{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:6px;font-size:12px;font-weight:500;cursor:default;border:1px solid transparent;position:relative;}
+.cal-dia.util{background:var(--ok-bg);border-color:var(--ok-b);color:var(--ok);font-weight:700;}
+.cal-dia.util-neutro{background:#fff;border-color:var(--bd);color:var(--tx);}
+.cal-dia.util-neutro:hover{background:var(--ok-bg);border-color:var(--ok-b);}
+.cal-dia.nao-trab{background:#fee2e2;border-color:#fca5a5;color:#b91c1c;font-weight:700;}
+.cal-dia.feriado{background:var(--err-bg);border-color:var(--err-b);color:var(--err);}
+.cal-dia.fds{background:#f1f5f9;color:#94a3b8;}
+.cal-dia.hoje{background:var(--MP);border-color:var(--M);color:var(--M);font-weight:700;outline:2px solid var(--M);}
+.cal-dia.fora{background:#f9f7f5;color:#d4cdc6;}
+.cal-dia.vazio{background:transparent;border:none;}
+.cal-dia.clicavel{cursor:pointer;}
+.cal-dia.clicavel:hover{filter:brightness(.93);transform:scale(1.06);z-index:1;}
+.cal-dia-num{font-size:13px;line-height:1;}
+.cal-dia-label{font-size:8px;text-transform:uppercase;letter-spacing:.3px;margin-top:2px;line-height:1;}
+
+@media(max-width:600px){
+  .kpi-v{font-size:20px;}
+  .gpc{flex-direction:column;}
+  .bl-r{gap:6px;}
+  .footer{flex-direction:column;}
+  .nav-wa span{display:none;}
+  .gal-grid{grid-template-columns:repeat(auto-fill,minmax(130px,1fr));}
+  .cal-dia-label{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-top">
+    <div class="hdr-left">
+      <div class="hdr-ico"><i class="ti ti-building" style="font-size:20px;color:#e8d9a0;"></i></div>
+      <div>
+        <div class="hdr-h1">CONDOMÍNIO PARQUE AMAZÔNIA</div>
+        <div class="hdr-s">PORTAL DE ACOMPANHAMENTO DA OBRA</div>
+      </div>
+    </div>
+    <div class="hdr-r">
+      <div class="live"><div class="live-dot"></div>EM EXECUÇÃO</div>
+    </div>
+  </div>
+  <div class="hdr-desc">Acompanhamento atualizado da obra de recuperação do subsolo.</div>
+</div>
+
+<!-- HORÁRIO -->
+<div class="hbar">
+  <i class="ti ti-clock" style="font-size:13px;color:#e8d9a0;"></i>
+  <span>HORÁRIO DE EXECUÇÃO:</span>
+  <strong>08:00 ÀS 12:00</strong>
+  <span class="hbar-sep">|</span>
+  <strong>13:30 ÀS 17:30</strong>
+  <span class="hbar-sep">|</span>
+  <span>SEGUNDA A SEXTA-FEIRA</span>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-tabs">
+    <button class="nb on" onclick="S('dash',this)"><i class="ti ti-layout-dashboard"></i>Dashboard</button>
+    <button class="nb" onclick="S('blocos',this)"><i class="ti ti-grid-dots"></i>Blocos</button>
+    <button class="nb" onclick="S('crono',this)"><i class="ti ti-calendar"></i>Cronograma</button>
+    <button class="nb" onclick="S('cal',this)"><i class="ti ti-calendar-month"></i>Calendário</button>
+    <button class="nb" onclick="S('tl',this)"><i class="ti ti-timeline"></i>Histórico</button>
+    <button class="nb" onclick="S('com',this)"><i class="ti ti-bell"></i>Comunicados</button>
+    <button class="nb" onclick="S('gal',this)"><i class="ti ti-photo"></i>Galeria</button>
+    <button class="nb" onclick="S('admin',this)"><i class="ti ti-settings"></i>Atualizar</button>
+  </div>
+  <button class="nav-wa" onclick="oWA()">
+    <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.978-1.413A9.953 9.953 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18.182a8.18 8.18 0 0 1-4.168-1.138l-.299-.178-3.093.877.877-3.094-.195-.308A8.182 8.182 0 1 1 12 20.182z"/></svg>
+    <span>FALAR COM A ENGENHEIRA</span>
+  </button>
+</nav>
+
+<!-- DASHBOARD -->
+<div class="sec on" id="sec-dash">
+  <div id="d-gpc"></div>
+  <div class="kpi-g" id="d-kpi"></div>
+  <p class="st" style="margin-bottom:12px;">RESUMO POR BLOCO</p>
+  <div id="d-res"></div>
+</div>
+
+<!-- BLOCOS -->
+<div class="sec" id="sec-blocos">
+  <p class="st">ETAPAS POR BLOCO</p>
+  <p class="ss">Detalhamento técnico das atividades executadas e em andamento. Clique no bloco para expandir.</p>
+  <div id="bl-list"></div>
+</div>
+
+<!-- CALENDÁRIO -->
+<div class="sec" id="sec-cal">
+  <p class="st">CALENDÁRIO DA OBRA</p>
+  <p class="ss">Clique em qualquer dia útil para marcar como <strong>Trabalhado</strong> ou <strong>Não trabalhado</strong>. O sistema compara automaticamente com o cronograma contratual.</p>
+
+  <!-- INDICADORES GLOBAIS -->
+  <div id="cal-indicadores"></div>
+
+  <!-- NAVEGAÇÃO -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin:16px 0;flex-wrap:wrap;gap:8px;">
+    <button onclick="calNav(-1)" style="padding:7px 14px;background:#fff;border:1px solid var(--bd);border-radius:7px;font-size:13px;font-family:var(--fn);cursor:pointer;font-weight:600;color:var(--M);">← Anterior</button>
+    <span id="cal-titulo" style="font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--tx);"></span>
+    <button onclick="calNav(1)" style="padding:7px 14px;background:#fff;border:1px solid var(--bd);border-radius:7px;font-size:13px;font-family:var(--fn);cursor:pointer;font-weight:600;color:var(--M);">Próximo →</button>
+  </div>
+
+  <div id="cal-body"></div>
+
+  <!-- LEGENDA -->
+  <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:14px;padding:12px 16px;background:#fff;border:1px solid var(--bd);border-radius:10px;">
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;"><div style="width:13px;height:13px;border-radius:3px;background:var(--ok-bg);border:1px solid var(--ok-b);"></div>TRABALHADO</div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;"><div style="width:13px;height:13px;border-radius:3px;background:#fee2e2;border:1px solid #fca5a5;"></div>NÃO TRABALHADO</div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;"><div style="width:13px;height:13px;border-radius:3px;background:#fff;border:1px solid var(--bd);"></div>DIA ÚTIL (CLIQUE PARA MARCAR)</div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;"><div style="width:13px;height:13px;border-radius:3px;background:var(--err-bg);border:1px solid var(--err-b);"></div>FERIADO</div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;"><div style="width:13px;height:13px;border-radius:3px;background:#f1f5f9;border:1px solid #e2e8f0;"></div>FIM DE SEMANA</div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;"><div style="width:13px;height:13px;border-radius:3px;background:var(--MP);border:1px solid var(--MB);"></div>HOJE</div>
+    <div style="font-size:11px;color:var(--mt);margin-left:auto;align-self:center;">Clique para alternar: Trabalhado → Não trabalhado → Padrão</div>
+  </div>
+</div>
+
+<!-- CRONOGRAMA -->
+<div class="sec" id="sec-crono">
+  <p class="st">CRONOGRAMA DE EXECUÇÃO</p>
+  <p class="ss">Datas calculadas em dias úteis, desconsiderando sábados, domingos e feriados de Porto Alegre.</p>
+  <div class="crono-wrap">
+    <table class="ct">
+      <thead><tr><th>Bloco</th><th>Área</th><th>Dias úteis</th><th>Início</th><th>Término prev.</th><th>Status</th><th>Avanço</th></tr></thead>
+      <tbody id="crono-bd"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- TIMELINE -->
+<div class="sec" id="sec-tl">
+  <p class="st">LINHA DO TEMPO</p>
+  <p class="ss">Marcos e eventos da obra</p>
+  <div class="tl" id="tl-bd"></div>
+</div>
+
+<!-- COMUNICADOS -->
+<div class="sec" id="sec-com">
+  <p class="st">COMUNICADOS AOS CONDÔMINOS</p>
+  <p class="ss">Interdições, ruídos previstos, ajustes de cronograma e informações gerais sobre a obra</p>
+  <div id="com-bd"></div>
+</div>
+
+<!-- GALERIA -->
+<div class="sec" id="sec-gal">
+  <p class="st">GALERIA DE IMAGENS</p>
+  <p class="ss">Registro fotográfico da obra por bloco. Utilize os filtros para navegar entre as fases de execução.</p>
+  <div class="gal-filtros">
+    <select class="gal-sel" id="gal-bloco" onchange="rGal()"><option value="">TODOS OS BLOCOS</option></select>
+    <select class="gal-sel" id="gal-fase" onchange="rGal()">
+      <option value="">TODAS AS FASES</option>
+      <option value="Antes">ANTES</option>
+      <option value="Durante">DURANTE</option>
+      <option value="Concluído">CONCLUÍDO</option>
+    </select>
+  </div>
+  <div id="gal-body"></div>
+</div>
+
+<!-- ADMIN -->
+<div class="sec" id="sec-admin">
+  <p class="st">ATUALIZAR DADOS DA OBRA</p>
+  <p class="ss">Área restrita — engenheira responsável</p>
+  <div class="ag" id="ag">
+    <i class="ti ti-lock" style="font-size:32px;color:var(--M);display:block;margin-bottom:10px;"></i>
+    <h3>ACESSO RESTRITO</h3>
+    <p>Digite a senha para acessar o painel de atualização</p>
+    <input class="ai" type="password" id="pwd" placeholder="Senha" onkeydown="if(event.key==='Enter')chkPwd()">
+    <button class="btn-M" onclick="chkPwd()"><i class="ti ti-arrow-right"></i> ENTRAR</button>
+    <p id="pwd-err" style="font-size:12px;color:var(--err);margin-top:10px;min-height:18px;"></p>
+  </div>
+
+  <div class="ap" id="apanel">
+
+    <!-- 1. STATUS GERAL DOS BLOCOS -->
+    <div class="as">
+      <div class="as-title"><i class="ti ti-pencil"></i>Status geral dos blocos</div>
+      <div class="as-sub">Atualize o status de execução de cada bloco. O percentual de avanço é calculado automaticamente a partir das medições das etapas.</div>
+      <div style="overflow-x:auto;">
+        <table class="admin-table">
+          <thead><tr><th>Bloco</th><th>Área</th><th>Status</th></tr></thead>
+          <tbody id="admin-tbl-body"></tbody>
+        </table>
+      </div>
+      <button class="btn-sv" onclick="saveStatus()"><i class="ti ti-device-floppy"></i> SALVAR STATUS</button>
+      <p class="sv-msg" id="sv-status-msg"></p>
+    </div>
+
+    <!-- 2. MEDIÇÕES POR ETAPA -->
+    <div class="as">
+      <div class="as-title"><i class="ti ti-ruler"></i>Medições por etapa</div>
+      <div class="as-sub">Selecione o bloco, informe o total e o executado de cada etapa. O percentual de avanço é calculado automaticamente e exibido para os condôminos.</div>
+      <select class="asel" id="a-bsel" onchange="rMed()"><option value="">Selecione o bloco…</option></select>
+      <div id="med-body"></div>
+      <div id="med-save" style="display:none;">
+        <button class="btn-sv" onclick="saveMed()"><i class="ti ti-device-floppy"></i> SALVAR MEDIÇÕES DESTE BLOCO</button>
+        <p class="sv-msg" id="sv-med-msg"></p>
+      </div>
+    </div>
+
+    <!-- 3. FOTOS -->
+    <div class="as">
+      <div class="as-title"><i class="ti ti-photo-plus"></i>Adicionar fotos à galeria</div>
+      <div class="as-sub">Cole o link da foto do Google Drive, selecione o bloco e a fase de execução. A imagem é exibida imediatamente na galeria.</div>
+      <div class="foto-ajuda">
+        <strong><i class="ti ti-brand-google-drive" style="vertical-align:-2px;"></i> Como obter o link do Google Drive</strong>
+        1. Faça upload da foto no Google Drive<br>
+        2. Clique com o botão direito na foto → <strong>Obter link</strong> → copie<br>
+        3. Cole aqui — o link é convertido automaticamente para exibição.
+      </div>
+      <div class="foto-form">
+        <div class="foto-form-row">
+          <input class="foto-inp" type="text" id="foto-url" placeholder="Cole o link do Google Drive aqui…" style="flex:2;">
+        </div>
+        <div class="foto-form-row">
+          <select class="foto-sel" id="foto-bloco"><option value="">Bloco…</option></select>
+          <select class="foto-sel" id="foto-fase">
+            <option value="Antes">Antes</option>
+            <option value="Durante">Durante</option>
+            <option value="Concluído">Concluído</option>
+          </select>
+          <input class="foto-inp" type="text" id="foto-leg" placeholder="Legenda (opcional)">
+          <button class="btn-add" onclick="addFoto()"><i class="ti ti-plus"></i> ADICIONAR</button>
+        </div>
+        <p id="foto-msg" style="font-size:12px;min-height:16px;margin-top:4px;"></p>
+      </div>
+      <p style="font-size:11px;font-weight:700;color:var(--mt);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">FOTOS CADASTRADAS (<span id="foto-count">0</span>)</p>
+      <div class="foto-lista" id="foto-lista"></div>
+    </div>
+
+    <!-- 4. COMUNICADOS -->
+    <div class="as">
+      <div class="as-title"><i class="ti ti-bell"></i>Publicar comunicado</div>
+      <div class="as-sub">O comunicado será exibido imediatamente na aba Comunicados.</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <select class="asel" id="c-tipo" style="margin-bottom:0;"><option value="info">Informativo</option><option value="warn">Atenção / Interdição</option><option value="ok">Conclusão / Boa notícia</option></select>
+        <input class="ai" type="text" id="c-tit" placeholder="Título do comunicado" style="text-align:left;margin-bottom:0;">
+        <textarea id="c-txt" placeholder="Texto do comunicado…" style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:7px;font-size:13px;font-family:var(--fn);height:80px;resize:vertical;"></textarea>
+        <button class="btn-M" onclick="addC()"><i class="ti ti-plus"></i> PUBLICAR COMUNICADO</button>
+        <p id="c-msg" style="font-size:13px;color:var(--ok);min-height:18px;text-align:center;font-weight:600;"></p>
+      </div>
+    </div>
+
+    <!-- 5. SAIR -->
+    <div class="as">
+      <div class="as-title"><i class="ti ti-logout"></i>Sessão</div>
+      <button onclick="logout()" style="padding:9px 18px;background:var(--bg);border:1px solid var(--bd);border-radius:7px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;font-family:var(--fn);cursor:pointer;color:var(--mt);">SAIR DO PAINEL</button>
+    </div>
+  </div>
+</div>
+
+<!-- RODAPÉ -->
+<footer class="footer">
+  <div class="footer-qr">
+    <div class="footer-qr-box"><div id="qr-el"></div></div>
+    <div style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;margin-top:6px;">ACESSE PELO CELULAR</div>
+    <div style="font-size:11px;color:var(--mt);">Escaneie para abrir o portal</div>
+  </div>
+  <div class="footer-info">
+    <div class="footer-brand">
+      <div class="footer-brand-ico"><i class="ti ti-building" style="font-size:18px;color:#e8d9a0;"></i></div>
+      <div>
+        <div class="footer-brand-name">Condomínio Parque Amazônia</div>
+        <div class="footer-brand-sub">Recuperação estrutural e pintura do subsolo</div>
+      </div>
+    </div>
+    <div class="footer-details">
+      <strong>Engenheira responsável:</strong> Jéssica Bandeira Moraes · CREA RS230405<br>
+      <strong>Empresa:</strong> B&amp;M Soluções em Engenharia<br>
+      <strong>Início da obra:</strong> 12/05/2026 · <strong>Conclusão prevista:</strong> 19/08/2027<br>
+      <strong>Horário:</strong> 08:00–12:00 e 13:30–17:30 (segunda a sexta-feira)
+    </div>
+    <button class="footer-wa" onclick="oWA()">
+      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.978-1.413A9.953 9.953 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18.182a8.18 8.18 0 0 1-4.168-1.138l-.299-.178-3.093.877.877-3.094-.195-.308A8.182 8.182 0 1 1 12 20.182z"/></svg>
+      FALAR COM A ENGENHEIRA
+    </button>
+  </div>
+</footer>
+
+<!-- LIGHTBOX -->
+<div class="lb" id="lb" onclick="lbBg(event)">
+  <div class="lb-inner">
+    <button class="lb-nav lb-prev" onclick="lbNav(-1)"><i class="ti ti-chevron-left"></i></button>
+    <button class="lb-nav lb-next" onclick="lbNav(1)"><i class="ti ti-chevron-right"></i></button>
+    <img id="lb-img" src="" alt="">
+    <div class="lb-cap">
+      <div class="lb-info"><strong id="lb-title"></strong><span id="lb-sub"></span></div>
+      <button class="lb-close" onclick="lbClose()"><i class="ti ti-x"></i></button>
+    </div>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+// ============================================================
+//  CONFIGURAÇÃO
+// ============================================================
+const PWD      = 'obra2025';
+const WA_NUM   = '5551996538202';
+const SITE_URL = 'https://engjessicamoraes.github.io/obraparqueamazonia';
+
+// ============================================================
+//  ETAPAS TÉCNICAS — definição com unidade
+//  tipo: 'm2' | 'un' | 'status'
+// ============================================================
+const ETAPAS = [
+  {id:1,  n:'Preparação e isolamento do canteiro de obras',                         tipo:'status'},
+  {id:2,  n:'Limpeza e lavagem hidráulica das superfícies',                         tipo:'m2'},
+  {id:3,  n:'Remoção das calhas e tampas de inspeção',                              tipo:'un'},
+  {id:4,  n:'Inspeção e mapeamento das manifestações patológicas',                  tipo:'un'},
+  {id:5,  n:'Remoção do concreto deteriorado e exposição das armaduras',            tipo:'un'},
+  {id:6,  n:'Tratamento de limpeza e desoxidação das armaduras',                    tipo:'un'},
+  {id:7,  n:'Aplicação de inibidor de corrosão nas armaduras',                      tipo:'un'},
+  {id:8,  n:'Recomposição do cobrimento com argamassa de reparo estrutural',        tipo:'un'},
+  {id:9,  n:'Regularização e preparo da base para pintura',                         tipo:'m2'},
+  {id:10, n:'Pintura do teto — 1ª demão',                                           tipo:'m2'},
+  {id:11, n:'Pintura do teto — 2ª demão',                                           tipo:'m2'},
+  {id:12, n:'Pintura de paredes — 1ª demão',                                        tipo:'m2'},
+  {id:13, n:'Pintura de paredes — 2ª demão',                                        tipo:'m2'},
+  {id:14, n:'Pintura de detalhes e acabamentos',                                    tipo:'m2'},
+  {id:15, n:'Pintura de delimitação das vagas',                                     tipo:'m2'},
+];
+
+const UNIDADE_LABEL = {m2:'m²', un:'un', status:'—'};
+
+// ============================================================
+//  BLOCOS — datas calculadas em dias úteis (sem sábado/domingo/feriados POA)
+// ============================================================
+const BLOCOS = [
+  {id:1, n:'BLOCO 1', v:'Vagas 1101 a 1203',                                         d:25, ini:'2026-05-12', fim:'16/06/2026', st:'andamento'},
+  {id:2, n:'BLOCO 2', v:'Vagas 1504 ao Box 03 · Transformador · Almoxarifado Gilmar', d:35, ini:'2026-06-17', fim:'04/08/2026', st:'pendente'},
+  {id:3, n:'BLOCO 3', v:'Box 04 ao Box 13',                                           d:25, ini:'2026-08-05', fim:'09/09/2026', st:'pendente'},
+  {id:4, n:'BLOCO 4', v:'Box 14 ao Box 22',                                           d:35, ini:'2026-09-10', fim:'29/10/2026', st:'pendente'},
+  {id:5, n:'BLOCO 5', v:'Box 23 ao Box 32',                                           d:40, ini:'2026-10-30', fim:'29/12/2026', st:'pendente'},
+  {id:6, n:'BLOCO 6', v:'Box 33 ao Box 44',                                           d:40, ini:'2026-12-30', fim:'01/03/2027', st:'pendente'},
+  {id:7, n:'BLOCO 7', v:'Box 45 ao Box 52 (duplo — até o fundo)',                    d:35, ini:'2027-03-02', fim:'20/04/2027', st:'pendente'},
+  {id:8, n:'BLOCO 8', v:'Box 53 ao Box 60 · Box 61 ao lado do Portão 1 (P1)',        d:35, ini:'2027-04-22', fim:'10/06/2027', st:'pendente'},
+  {id:9, n:'BLOCO 9', v:'Box 62, 63, 64 ao 67',                                      d:50, ini:'2027-06-11', fim:'19/08/2027', st:'pendente'},
+];
+
+// Estado das medições: [blocoIdx][etapaIdx] = {total, exec, statusSimples}
+const MED = BLOCOS.map(() =>
+  ETAPAS.map(e => e.tipo === 'status' ? {statusSimples:'pendente'} : {total:0, exec:0})
+);
+
+const ST_OPTS  = ['concluido','andamento','pendente','aguardando','atraso'];
+const SL       = {concluido:'CONCLUÍDO', andamento:'EM ANDAMENTO', pendente:'NÃO INICIADO', aguardando:'AGUARDANDO', atraso:'COM ATRASO'};
+const SPILL    = {concluido:'p-ok', andamento:'p-wip', pendente:'p-pend', atraso:'p-err', aguardando:'p-wait'};
+const FILL_CLS = {concluido:'f-ok', andamento:'f-wip', pendente:'', aguardando:'f-G', atraso:'f-M'};
+
+let FOTOS = [];
+let COMS  = [
+  {t:'info', d:'12/05/2026', h:'Início da obra — Bloco 1', p:'Os serviços de recuperação estrutural e pintura foram iniciados no Bloco 1 (Vagas 1101 a 1203). O canteiro de obras está mobilizado e os trabalhos ocorrem dentro do horário regulamentar, de segunda a sexta-feira.'},
+];
+const TLV = [
+  {s:'wip',  d:'MAI 2026', h:'Início da obra — Bloco 1',   p:'Mobilização da equipe. Início dos serviços de recuperação estrutural e revestimento nas Vagas 1101 a 1203.'},
+  {s:'fut',  d:'JUN 2026', h:'Início previsto — Bloco 2',  p:'Vagas 1504 ao Box 03 · Transformador · Almoxarifado Gilmar. Previsão: 18/06/2026.'},
+  {s:'fut',  d:'AGO 2026', h:'Início previsto — Bloco 3',  p:'Box 04 ao Box 13. Previsão: 06/08/2026.'},
+  {s:'fut',  d:'SET 2026', h:'Início previsto — Bloco 4',  p:'Box 14 ao Box 22. Previsão: 11/09/2026.'},
+  {s:'fut',  d:'NOV 2026', h:'Início previsto — Bloco 5',  p:'Box 23 ao Box 32. Previsão: 03/11/2026.'},
+  {s:'fut',  d:'DEZ 2026', h:'Início previsto — Bloco 6',  p:'Box 33 ao Box 44. Previsão: 31/12/2026.'},
+  {s:'fut',  d:'MAR 2027', h:'Início previsto — Bloco 7',  p:'Box 45 ao Box 52 (duplo). Previsão: 02/03/2027.'},
+  {s:'fut',  d:'ABR 2027', h:'Início previsto — Bloco 8',  p:'Box 53 ao Box 60 · Box 61. Previsão: 22/04/2027.'},
+  {s:'fut',  d:'JUN 2027', h:'Início previsto — Bloco 9',  p:'Box 62 ao Box 67. Previsão: 11/06/2027.'},
+  {s:'fut',  d:'AGO 2027', h:'Previsão de conclusão geral', p:'Entrega final com todos os blocos concluídos. Data prevista: 19/08/2027.'},
+];
+
+// ============================================================
+//  CÁLCULO DE PERCENTUAL POR BLOCO (baseado em medições)
+// ============================================================
+function calcPct(bi){
+  const meds = MED[bi];
+  const etapasComMed = ETAPAS.filter(e => e.tipo !== 'status');
+  const total = etapasComMed.reduce((s,e,i) => {
+    const idx = ETAPAS.indexOf(e);
+    return s + (meds[idx].total || 0);
+  }, 0);
+  if(total === 0) return 0;
+  const exec = etapasComMed.reduce((s,e) => {
+    const idx = ETAPAS.indexOf(e);
+    return s + Math.min(meds[idx].exec || 0, meds[idx].total || 0);
+  }, 0);
+  return Math.round((exec / total) * 100);
+}
+
+function gPct(){
+  const td = BLOCOS.reduce((s,b)=>s+b.d,0);
+  return Math.round(BLOCOS.reduce((s,b,i)=>s+(calcPct(i)/100)*b.d,0)/td*100);
+}
+
+function diasTrab(){
+  const ini = new Date('2026-05-12'), hj = new Date();
+  if(hj < ini) return 0;
+  const feriados = [
+    '2026-06-04','2026-09-07','2026-09-20','2026-10-12',
+    '2026-11-02','2026-11-15','2026-11-20','2026-12-25',
+    '2027-01-01','2027-02-02','2027-02-15','2027-02-16',
+    '2027-04-02','2027-04-21','2027-05-01','2027-06-03',
+    '2027-09-07','2027-09-20'
+  ];
+  let d = 0, c = new Date(ini);
+  while(c <= hj){
+    const dw = c.getDay();
+    const ds = c.toISOString().slice(0,10);
+    if(dw > 0 && dw < 6 && !feriados.includes(ds)) d++;
+    c.setDate(c.getDate()+1);
+  }
+  return d;
+}
+
+function diasUteisRestantes(){
+  const fim = new Date('2027-08-19');
+  const hj  = new Date();
+  hj.setHours(0,0,0,0);
+  fim.setHours(0,0,0,0);
+  if(hj >= fim) return 0;
+  const feriados = [
+    '2026-06-04','2026-09-07','2026-09-20','2026-10-12',
+    '2026-11-02','2026-11-15','2026-11-20','2026-12-25',
+    '2027-01-01','2027-02-02','2027-02-15','2027-02-16',
+    '2027-04-02','2027-04-21','2027-05-01','2027-06-03',
+    '2027-09-07','2027-09-20'
+  ];
+  let d = 0, c = new Date(hj);
+  c.setDate(c.getDate() + 1);
+  while(c <= fim){
+    const dw = c.getDay();
+    const ds = c.toISOString().slice(0,10);
+    if(dw > 0 && dw < 6 && !feriados.includes(ds)) d++;
+    c.setDate(c.getDate() + 1);
+  }
+  return d;
+}
+
+function fc(st){ return FILL_CLS[st]||''; }
+function pillCls(st){ return SPILL[st]||'p-pend'; }
+
+// ============================================================
+//  RENDER DASHBOARD
+// ============================================================
+function rDash(){
+  const gp   = gPct();
+  const done = BLOCOS.filter(b=>b.st==='concluido').length;
+  const wip  = BLOCOS.filter(b=>b.st==='andamento').length;
+  const pend = BLOCOS.filter(b=>b.st==='pendente').length;
+
+  const r=36,cx=45,cy=45,ci=2*Math.PI*r,da=(ci*gp/100).toFixed(1);
+  document.getElementById('d-gpc').innerHTML=`<div class="gpc">
+    <div class="gpc-ring"><svg width="88" height="88" viewBox="0 0 90 90"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#f0ece6" stroke-width="7"/><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#5C2444" stroke-width="7" stroke-dasharray="${da} ${ci.toFixed(1)}" stroke-linecap="round"/></svg><div class="gpc-n"><span>${gp}%</span><small>GLOBAL</small></div></div>
+    <div class="gpc-rows">
+      <div class="gr"><span class="gr-l">CONCLUÍDOS</span><div class="gr-t"><div class="gr-f f-ok" style="width:${Math.round(done/9*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${done}/9</span></div>
+      <div class="gr"><span class="gr-l">EM ANDAMENTO</span><div class="gr-t"><div class="gr-f f-wip" style="width:${Math.round(wip/9*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${wip}/9</span></div>
+      <div class="gr"><span class="gr-l">PENDENTES</span><div class="gr-t"><div class="gr-f f-G" style="width:${Math.round(pend/9*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${pend}/9</span></div>
+    </div>
+  </div>`;
+
+  document.getElementById('d-kpi').innerHTML=`
+    <div class="kpi m"><div class="kpi-l">Total executado</div><div class="kpi-v" style="color:var(--M)">${gp}%</div><div class="kpi-h">da obra completa</div></div>
+    <div class="kpi ok"><div class="kpi-l">Concluídos</div><div class="kpi-v" style="color:var(--ok)">${done}</div><div class="kpi-h">de 9 blocos</div></div>
+    <div class="kpi g"><div class="kpi-l">Em andamento</div><div class="kpi-v" style="color:var(--G)">${wip}</div><div class="kpi-h">blocos ativos</div></div>
+    <div class="kpi"><div class="kpi-l">Pendentes</div><div class="kpi-v">${pend}</div><div class="kpi-h">não iniciados</div></div>`;
+
+  document.getElementById('d-res').innerHTML=BLOCOS.map((b,i)=>{
+    const p=calcPct(i), f=fc(b.st);
+    return `<div style="background:#fff;border:1px solid var(--bd);border-radius:8px;padding:11px 14px;margin-bottom:7px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+      <div style="width:30px;height:30px;border-radius:6px;background:var(--M);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">${b.id}</div>
+      <div style="flex:1;min-width:120px;"><div style="font-size:13px;font-weight:700;letter-spacing:.2px;">${b.n}</div><div style="font-size:11px;color:var(--mt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${b.v}</div></div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+        <div style="min-width:64px;"><div class="pt"><div class="pf ${f}" style="width:${p}%"></div></div></div>
+        <span style="font-size:13px;font-weight:700;min-width:30px;text-align:right;">${p}%</span>
+        <span class="pill ${pillCls(b.st)}">${SL[b.st]}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+//  RENDER BLOCOS COM ETAPAS TÉCNICAS
+// ============================================================
+function rBlocos(){
+  document.getElementById('bl-list').innerHTML=BLOCOS.map((b,i)=>{
+    const p = calcPct(i), f = fc(b.st);
+    const etHtml = ETAPAS.map((e,ei) => {
+      const m = MED[i][ei];
+      if(e.tipo === 'status'){
+        const st = m.statusSimples || 'pendente';
+        return `<div class="et-status-row">
+          <span class="et-num">${e.id.toString().padStart(2,'0')}</span>
+          <span style="flex:1;font-size:12.5px;font-weight:500;">${e.n}</span>
+          <span class="pill ${pillCls(st)}">${SL[st]}</span>
+        </div>`;
+      }
+      const total = m.total || 0;
+      const exec  = Math.min(m.exec || 0, total);
+      const pct   = total > 0 ? Math.round((exec/total)*100) : 0;
+      const unit  = UNIDADE_LABEL[e.tipo];
+      const col   = pct===100?'var(--ok)':pct>0?'var(--wip)':'var(--pend)';
+      const stPct = pct===100?'concluido':pct>0?'andamento':'pendente';
+      return `<div class="et-row">
+        <div class="et-top">
+          <span class="et-num">${e.id.toString().padStart(2,'0')}</span>
+          <span class="et-nome">${e.n}</span>
+          <div class="et-right">
+            <span class="et-medida">${unit}</span>
+            <span class="et-pct" style="color:${col};">${pct}%</span>
+            <span class="pill ${pillCls(stPct)}" style="font-size:9px;">${SL[stPct]}</span>
+          </div>
+        </div>
+        <div class="et-bar"><div class="et-fill" style="width:${pct}%;background:${col};opacity:.85;"></div></div>
+        <div class="et-valores">
+          <span class="et-val">Executado: <strong>${exec} ${unit}</strong></span>
+          <span class="et-val">Total previsto: <strong>${total > 0 ? total+' '+unit : '—'}</strong></span>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="bl-card">
+      <div class="bl-head" onclick="tog(${i})">
+        <div class="bl-num">${b.id}</div>
+        <div class="bl-info"><div class="bl-nome">${b.n}</div><div class="bl-vg">${b.v}</div></div>
+        <div class="bl-r">
+          <span class="bl-pct" style="color:${b.st==='concluido'?'var(--ok)':b.st==='andamento'?'var(--wip)':'var(--pend)'}">${p}%</span>
+          <span class="pill ${pillCls(b.st)}">${SL[b.st]}</span>
+          <i class="ti ti-chevron-down" id="cv-${i}" style="font-size:14px;color:var(--mt);transition:transform .2s;"></i>
+        </div>
+      </div>
+      <div class="bl-prog"><div class="pt"><div class="pf ${f}" style="width:${p}%"></div></div></div>
+      <div id="et-${i}" style="display:none">
+        <div class="etapas">
+          <div class="et-header"><i class="ti ti-list-check" style="font-size:11px;"></i> ETAPAS DE EXECUÇÃO — ${b.d} DIAS ÚTEIS PREVISTOS · INÍCIO: ${new Date(b.ini).toLocaleDateString('pt-BR')}</div>
+          ${etHtml}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function tog(i){
+  const el=document.getElementById('et-'+i),cv=document.getElementById('cv-'+i);
+  const op=el.style.display==='none';
+  el.style.display=op?'block':'none';
+  if(cv)cv.style.transform=op?'rotate(180deg)':'';
+}
+
+// ============================================================
+//  CRONOGRAMA / TIMELINE / COMUNICADOS
+// ============================================================
+function rCrono(){
+  document.getElementById('crono-bd').innerHTML=BLOCOS.map((b,i)=>{
+    const p=calcPct(i),f=fc(b.st);
+    return `<tr>
+      <td style="font-weight:700;letter-spacing:.2px;">${b.n}</td>
+      <td style="font-size:11.5px;color:var(--mt);max-width:150px;">${b.v}</td>
+      <td style="font-weight:600;">${b.d}</td>
+      <td>${new Date(b.ini).toLocaleDateString('pt-BR')}</td>
+      <td>${b.fim}</td>
+      <td><span class="pill ${pillCls(b.st)}">${SL[b.st]}</span></td>
+      <td style="min-width:90px;"><div style="display:flex;align-items:center;gap:5px;"><div class="pt" style="flex:1;"><div class="pf ${f}" style="width:${p}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${p}%</span></div></td>
+    </tr>`;
+  }).join('');
+}
+
+function rTL(){ document.getElementById('tl-bd').innerHTML=TLV.map(e=>`<div class="tl-i"><div class="tl-d ${e.s}"></div><div class="tl-dt">${e.d}</div><div class="tl-h">${e.h}</div><div class="tl-p">${e.p}</div></div>`).join(''); }
+
+function rCom(){ document.getElementById('com-bd').innerHTML=COMS.map(c=>`<div class="cc ${c.t}"><div class="cc-meta"><span class="cc-dt"><i class="ti ti-calendar" style="font-size:11px;vertical-align:-1px;"></i> ${c.d}</span><span class="cc-tag" style="background:${c.t==='warn'?'var(--wip-bg)':c.t==='ok'?'var(--ok-bg)':'var(--MP)'};color:${c.t==='warn'?'var(--wip)':c.t==='ok'?'var(--ok)':'var(--M)'};">${c.t==='warn'?'ATENÇÃO':c.t==='ok'?'CONCLUSÃO':'INFORMATIVO'}</span></div><div class="cc-h">${c.h}</div><div class="cc-p">${c.p}</div></div>`).join(''); }
+
+// ============================================================
+//  GALERIA + LIGHTBOX
+// ============================================================
+let lbFotos=[], lbIdx=0;
+
+function driveUrl(raw){
+  if(!raw) return '';
+  if(raw.includes('uc?export=view')||raw.includes('uc?id=')) return raw;
+  const m1=raw.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
+  const m2=raw.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  const id=m1?m1[1]:m2?m2[1]:'';
+  return id?'https://drive.google.com/uc?export=view&id='+id:raw;
+}
+
+function rGal(){
+  const bSel=document.getElementById('gal-bloco').value;
+  const fSel=document.getElementById('gal-fase').value;
+  const fil=FOTOS.filter(f=>(bSel===''||f.bi==bSel)&&(fSel===''||f.fase===fSel));
+  lbFotos=fil;
+  const body=document.getElementById('gal-body');
+  if(fil.length===0){ body.innerHTML=`<div class="gal-empty"><i class="ti ti-photo-off"></i><p style="font-size:14px;font-weight:600;margin-bottom:4px;">NENHUMA FOTO CADASTRADA</p><p style="font-size:12px;">As imagens serão exibidas aqui conforme forem adicionadas no painel Atualizar.</p></div>`; return; }
+  body.innerHTML=`<div class="gal-grid">${fil.map((f,i)=>`<div class="gi" onclick="lbOpen(${i})"><img src="${driveUrl(f.url)}" alt="${f.leg||f.fase}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="gi-ph" style="display:none"><i class="ti ti-photo-off"></i></div><div class="gi-cap"><div class="gi-bloco">${BLOCOS[f.bi].n}</div><div class="gi-fase">${f.fase}</div>${f.leg?`<div class="gi-leg">${f.leg}</div>`:''}<div class="gi-dt">${f.dt}</div></div></div>`).join('')}</div>`;
+}
+
+function lbOpen(i){ lbIdx=i; lbShow(); document.getElementById('lb').classList.add('on'); }
+function lbShow(){ const f=lbFotos[lbIdx]; document.getElementById('lb-img').src=driveUrl(f.url); document.getElementById('lb-title').textContent=(f.leg||f.fase)+' — '+BLOCOS[f.bi].n; document.getElementById('lb-sub').textContent=f.dt+(lbFotos.length>1?' · '+( lbIdx+1)+' de '+lbFotos.length:''); }
+function lbNav(d){ lbIdx=(lbIdx+d+lbFotos.length)%lbFotos.length; lbShow(); }
+function lbClose(){ document.getElementById('lb').classList.remove('on'); }
+function lbBg(e){ if(e.target===document.getElementById('lb'))lbClose(); }
+document.addEventListener('keydown',e=>{ if(!document.getElementById('lb').classList.contains('on'))return; if(e.key==='ArrowLeft')lbNav(-1); if(e.key==='ArrowRight')lbNav(1); if(e.key==='Escape')lbClose(); });
+
+// ============================================================
+//  ADMIN — LOGIN
+// ============================================================
+function chkPwd(){
+  if(document.getElementById('pwd').value===PWD){
+    document.getElementById('ag').style.display='none';
+    document.getElementById('apanel').classList.add('on');
+    renderAdminTable();
+    populateSels();
+  } else {
+    document.getElementById('pwd-err').textContent='Senha incorreta. Tente novamente.';
+  }
+}
+function logout(){ document.getElementById('ag').style.display='block'; document.getElementById('apanel').classList.remove('on'); document.getElementById('pwd').value=''; document.getElementById('pwd-err').textContent=''; }
+
+// ============================================================
+//  ADMIN — STATUS DOS BLOCOS
+// ============================================================
+function renderAdminTable(){
+  document.getElementById('admin-tbl-body').innerHTML=BLOCOS.map((b,i)=>
+    `<tr><td style="font-weight:700;">${b.n}</td><td style="font-size:11.5px;color:var(--mt);">${b.v.split('·')[0].trim()}</td>
+    <td><select class="st-sel" id="inp-st-${i}">${ST_OPTS.map(o=>`<option value="${o}"${b.st===o?' selected':''}>${SL[o]}</option>`).join('')}</select></td></tr>`
+  ).join('');
+}
+function saveStatus(){
+  BLOCOS.forEach((b,i)=>{ b.st=document.getElementById('inp-st-'+i).value; });
+  rDash(); rBlocos(); rCrono();
+  const m=document.getElementById('sv-status-msg');
+  m.textContent='✓ STATUS ATUALIZADO — '+new Date().toLocaleTimeString('pt-BR');
+  m.style.color='var(--ok)';
+  setTimeout(()=>{m.textContent='';},4000);
+}
+
+// ============================================================
+//  ADMIN — MEDIÇÕES POR ETAPA
+// ============================================================
+function populateSels(){
+  ['a-bsel','foto-bloco'].forEach(id=>{
+    const s=document.getElementById(id); if(!s||s.options.length>1) return;
+    BLOCOS.forEach((b,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=b.n+' — '+b.v.split('·')[0].trim(); s.appendChild(o); });
+  });
+  const sg=document.getElementById('gal-bloco'); if(sg.options.length<=1) BLOCOS.forEach((b,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=b.n; sg.appendChild(o); });
+  renderFotoLista();
+}
+
+function rMed(){
+  const bi=parseInt(document.getElementById('a-bsel').value);
+  const wrap=document.getElementById('med-save');
+  if(isNaN(bi)){ document.getElementById('med-body').innerHTML=''; wrap.style.display='none'; return; }
+  wrap.style.display='block';
+  document.getElementById('med-body').innerHTML=`<div style="background:var(--bg);border-radius:10px;padding:12px;">
+    ${ETAPAS.map((e,ei)=>{
+      const m=MED[bi][ei];
+      const unit=UNIDADE_LABEL[e.tipo];
+      if(e.tipo==='status'){
+        return `<div class="med-row">
+          <span style="font-size:10px;font-weight:700;color:var(--M);background:var(--MP);border-radius:4px;padding:2px 6px;flex-shrink:0;">${e.id.toString().padStart(2,'0')}</span>
+          <span class="med-nome">${e.n}</span>
+          <select class="med-status-sel" id="med-st-${bi}-${ei}">
+            ${ST_OPTS.map(o=>`<option value="${o}"${(m.statusSimples||'pendente')===o?' selected':''}>${SL[o]}</option>`).join('')}
+          </select>
+        </div>`;
+      }
+      return `<div class="med-row">
+        <span style="font-size:10px;font-weight:700;color:var(--M);background:var(--MP);border-radius:4px;padding:2px 6px;flex-shrink:0;">${e.id.toString().padStart(2,'0')}</span>
+        <span class="med-nome">${e.n}</span>
+        <span class="med-unit">${unit}</span>
+        <input class="med-inp" type="number" min="0" id="med-exec-${bi}-${ei}" value="${m.exec||0}" placeholder="0">
+        <span class="med-sep">de</span>
+        <input class="med-inp" type="number" min="0" id="med-tot-${bi}-${ei}" value="${m.total||0}" placeholder="total">
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function saveMed(){
+  const bi=parseInt(document.getElementById('a-bsel').value);
+  if(isNaN(bi)) return;
+  ETAPAS.forEach((e,ei)=>{
+    if(e.tipo==='status'){
+      const sel=document.getElementById('med-st-'+bi+'-'+ei);
+      if(sel) MED[bi][ei].statusSimples=sel.value;
+    } else {
+      const exec=document.getElementById('med-exec-'+bi+'-'+ei);
+      const tot =document.getElementById('med-tot-'+bi+'-'+ei);
+      if(exec) MED[bi][ei].exec=Math.max(0,parseInt(exec.value)||0);
+      if(tot)  MED[bi][ei].total=Math.max(0,parseInt(tot.value)||0);
+    }
+  });
+  rDash(); rBlocos(); rCrono();
+  const m=document.getElementById('sv-med-msg');
+  m.textContent='✓ MEDIÇÕES DO BLOCO '+(bi+1)+' ATUALIZADAS — '+new Date().toLocaleTimeString('pt-BR');
+  m.style.color='var(--ok)';
+  setTimeout(()=>{m.textContent='';},4000);
+}
+
+// ============================================================
+//  ADMIN — FOTOS
+// ============================================================
+function addFoto(){
+  const url=document.getElementById('foto-url').value.trim();
+  const bi=document.getElementById('foto-bloco').value;
+  const fase=document.getElementById('foto-fase').value;
+  const leg=document.getElementById('foto-leg').value.trim();
+  const msg=document.getElementById('foto-msg');
+  if(!url){ msg.textContent='Cole o link do Google Drive antes de adicionar.'; msg.style.color='var(--err)'; return; }
+  if(bi===''){ msg.textContent='Selecione o bloco.'; msg.style.color='var(--err)'; return; }
+  FOTOS.push({bi:parseInt(bi),fase,url,leg,dt:new Date().toLocaleDateString('pt-BR')});
+  document.getElementById('foto-url').value='';
+  document.getElementById('foto-leg').value='';
+  msg.textContent='✓ FOTO ADICIONADA À GALERIA.'; msg.style.color='var(--ok)';
+  setTimeout(()=>{msg.textContent='';},3000);
+  renderFotoLista(); rGal();
+}
+function delFoto(i){ FOTOS.splice(i,1); renderFotoLista(); rGal(); }
+function renderFotoLista(){
+  document.getElementById('foto-count').textContent=FOTOS.length;
+  const lista=document.getElementById('foto-lista');
+  if(FOTOS.length===0){ lista.innerHTML='<p style="font-size:12px;color:var(--mt);text-align:center;padding:16px 0;">Nenhuma foto adicionada ainda.</p>'; return; }
+  lista.innerHTML=FOTOS.map((f,i)=>`<div class="foto-item"><img src="${driveUrl(f.url)}" alt="" onerror="this.style.background='#f0ece6';this.removeAttribute('src')"><div class="foto-item-info"><div class="foto-item-bloco">${BLOCOS[f.bi].n}</div><div class="foto-item-fase">${f.fase}${f.leg?' — '+f.leg:''}</div><div class="foto-item-leg">Adicionada em ${f.dt}</div></div><button class="btn-del" onclick="delFoto(${i})" title="Remover"><i class="ti ti-trash"></i></button></div>`).join('');
+}
+
+// ============================================================
+//  ADMIN — COMUNICADOS
+// ============================================================
+function addC(){
+  const t=document.getElementById('c-tipo').value,h=document.getElementById('c-tit').value.trim(),p=document.getElementById('c-txt').value.trim();
+  const m=document.getElementById('c-msg');
+  if(!h||!p){ m.textContent='Preencha o título e o texto.'; m.style.color='var(--err)'; return; }
+  COMS.unshift({t,d:new Date().toLocaleDateString('pt-BR'),h,p});
+  rCom();
+  document.getElementById('c-tit').value=''; document.getElementById('c-txt').value='';
+  m.textContent='✓ COMUNICADO PUBLICADO.'; m.style.color='var(--ok)';
+  setTimeout(()=>{m.textContent='';},3500);
+}
+
+// ============================================================
+//  CALENDÁRIO EDITÁVEL COM CONTROLE DE DIAS
+// ============================================================
+const FERIADOS_SET = new Set([
+  '2026-06-04','2026-09-07','2026-09-20','2026-10-12',
+  '2026-11-02','2026-11-15','2026-11-20','2026-12-25',
+  '2027-01-01','2027-02-02','2027-02-15','2027-02-16',
+  '2027-04-02','2027-04-21','2027-05-01','2027-06-03',
+  '2027-09-07','2027-09-20'
+]);
+const FERIADOS_NOME = {
+  '2026-06-04':'Corpus Christi',
+  '2026-09-07':'Independência do Brasil','2026-09-20':'Revolução Farroupilha',
+  '2026-10-12':'N. Sra. Aparecida','2026-11-02':'Finados',
+  '2026-11-15':'Proc. da República','2026-11-20':'Consciência Negra',
+  '2026-12-25':'Natal',
+  '2027-01-01':'Confraternização Universal',
+  '2027-02-02':'N. Sra. dos Navegantes',
+  '2027-02-15':'Carnaval','2027-02-16':'Carnaval',
+  '2027-04-02':'Sexta-feira Santa','2027-04-21':'Tiradentes',
+  '2027-05-01':'Dia do Trabalho','2027-06-03':'Corpus Christi',
+  '2027-09-07':'Independência do Brasil','2027-09-20':'Revolução Farroupilha'
+};
+const OBRA_INI  = new Date('2026-05-12T00:00:00');
+const OBRA_FIM  = new Date('2027-08-19T00:00:00');
+const MESES_PT  = ['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
+const DOWS_PT   = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
+
+// CAL_MANUAL: 'YYYY-MM-DD' → 'trabalhado' | 'nao_trabalhado'
+// Dias úteis sem marcação = trabalhado por padrão
+const CAL_MANUAL = {};
+
+let calAno = 2026, calMes = 4;
+
+// Retorna qual bloco (índice 0-8) um dia pertence pelo cronograma contratual
+// Retorna -1 se fora do período
+function blocoDodia(ds){
+  const d = new Date(ds+'T00:00:00');
+  for(let i=0;i<BLOCOS.length;i++){
+    const ini = new Date(BLOCOS[i].ini+'T00:00:00');
+    // fim contratual: calcular a partir do ini + dias úteis
+    const fim = fimContratual(i);
+    if(d >= ini && d <= fim) return i;
+  }
+  return -1;
+}
+
+// Cache dos fins contratuais calculados
+const _fimCache = {};
+function fimContratual(bi){
+  if(_fimCache[bi]) return _fimCache[bi];
+  const ini = new Date(BLOCOS[bi].ini+'T00:00:00');
+  let c = new Date(ini), cont = 0, dias = BLOCOS[bi].d;
+  while(cont < dias){
+    const dw = c.getDay(), ds = c.toISOString().slice(0,10);
+    if(dw>0 && dw<6 && !FERIADOS_SET.has(ds)) cont++;
+    if(cont < dias) c.setDate(c.getDate()+1);
+  }
+  _fimCache[bi] = new Date(c);
+  return _fimCache[bi];
+}
+
+// Conta dias trabalhados e não trabalhados por bloco — apenas marcações manuais
+function contarDiasPorBloco(){
+  const res = BLOCOS.map(()=>({trab:0, naoTrab:0, contratual:0}));
+  BLOCOS.forEach((b,i)=>{ res[i].contratual = b.d; });
+
+  // Apenas dias marcados explicitamente
+  Object.entries(CAL_MANUAL).forEach(([ds, estado])=>{
+    const bi = blocoDodia(ds);
+    if(bi < 0) return;
+    if(estado === 'trabalhado')          res[bi].trab++;
+    else if(estado === 'nao_trabalhado') res[bi].naoTrab++;
+  });
+
+  return res;
+}
+
+function calNav(dir){
+  calMes += dir;
+  if(calMes > 11){ calMes=0; calAno++; }
+  if(calMes < 0){ calMes=11; calAno--; }
+  rCal();
+}
+
+function calToggle(ds){
+  const atual = CAL_MANUAL[ds];
+  if(!atual)                        CAL_MANUAL[ds] = 'trabalhado';
+  else if(atual==='trabalhado')     CAL_MANUAL[ds] = 'nao_trabalhado';
+  else                              delete CAL_MANUAL[ds];
+  rCal();
+}
+
+function rCalIndicadores(){
+  const dados = contarDiasPorBloco();
+  const totalTrab    = dados.reduce((s,d)=>s+d.trab,0);
+  const totalContrat = dados.reduce((s,d)=>s+d.contratual,0);
+  const totalNao     = dados.reduce((s,d)=>s+d.naoTrab,0);
+  const pctGlobal    = Math.round((totalTrab/totalContrat)*100);
+  const atrasoBlocos = dados.filter((d,i)=>d.trab+d.naoTrab>0 && d.trab+d.naoTrab > d.contratual).length;
+
+  // Projeta data de conclusão com base no ritmo atual
+  let projecao = '—';
+  if(totalTrab > 0){
+    const diasRestContrat = totalContrat - totalTrab;
+    // data de hoje + dias restantes em dias úteis
+    let c = new Date(); c.setHours(0,0,0,0);
+    let cont = 0;
+    while(cont < diasRestContrat){
+      c.setDate(c.getDate()+1);
+      const dw=c.getDay(), ds=c.toISOString().slice(0,10);
+      if(dw>0&&dw<6&&!FERIADOS_SET.has(ds)) cont++;
+    }
+    projecao = c.toLocaleDateString('pt-BR');
+  }
+
+  const statusCor = atrasoBlocos > 0 ? 'var(--err)' : totalTrab > 0 ? 'var(--ok)' : 'var(--mt)';
+  const statusTxt = atrasoBlocos > 0 ? `${atrasoBlocos} BLOCO(S) COM DIAS EXCEDIDOS` : totalTrab > 0 ? 'NO PRAZO' : 'OBRA NÃO INICIADA';
+
+  let html = `<div style="background:#fff;border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:4px;">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mt);margin-bottom:12px;">CONTROLE GLOBAL DA OBRA</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:14px;">
+      <div style="text-align:center;padding:10px;background:var(--ok-bg);border:1px solid var(--ok-b);border-radius:8px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--ok);">Dias trabalhados</div>
+        <div style="font-size:22px;font-weight:700;color:var(--ok);">${totalTrab}</div>
+        <div style="font-size:11px;color:var(--ok);">de ${totalContrat} contratuais</div>
+      </div>
+      <div style="text-align:center;padding:10px;background:#fee2e2;border:1px solid #fca5a5;border-radius:8px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:#b91c1c;">Não trabalhados</div>
+        <div style="font-size:22px;font-weight:700;color:#b91c1c;">${totalNao}</div>
+        <div style="font-size:11px;color:#b91c1c;">dias marcados</div>
+      </div>
+      <div style="text-align:center;padding:10px;background:var(--GP);border:1px solid var(--GB);border-radius:8px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--G);">Projeção conclusão</div>
+        <div style="font-size:16px;font-weight:700;color:var(--G);margin-top:4px;">${projecao}</div>
+        <div style="font-size:11px;color:var(--G);">Contratual: 19/08/2027</div>
+      </div>
+      <div style="text-align:center;padding:10px;background:${atrasoBlocos>0?'var(--err-bg)':'var(--pend-bg)'};border:1px solid ${atrasoBlocos>0?'var(--err-b)':'var(--pend-b)'};border-radius:8px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:${statusCor};">Status</div>
+        <div style="font-size:12px;font-weight:700;color:${statusCor};margin-top:6px;">${statusTxt}</div>
+      </div>
+    </div>
+    <div style="margin-bottom:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--mt);">AVANÇO POR BLOCO</div>
+    ${dados.map((d,i)=>{
+      if(d.trab+d.naoTrab===0 && !BLOCOS[i].ini) return '';
+      const pct = Math.min(Math.round((d.trab/d.contratual)*100),100);
+      const excedeu = d.trab > d.contratual;
+      const cor = excedeu?'var(--err)':d.trab>0?'var(--ok)':'var(--pend)';
+      const fillCor = excedeu?'#dc2626':d.trab>0?'#2d7a3a':'#d8d4cf';
+      return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--bd);flex-wrap:wrap;">
+        <div style="width:28px;height:28px;border-radius:5px;background:var(--M);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">${i+1}</div>
+        <div style="min-width:80px;flex:1;">
+          <div style="font-size:11px;font-weight:700;">${BLOCOS[i].n}</div>
+          <div style="font-size:10px;color:var(--mt);">${d.trab} trab. / ${d.contratual} contratuais${d.naoTrab>0?' · '+d.naoTrab+' não trab.':''}</div>
+        </div>
+        <div style="min-width:100px;flex:1;">
+          <div style="height:6px;background:#f0ece6;border-radius:3px;overflow:hidden;">
+            <div style="height:100%;border-radius:3px;background:${fillCor};width:${Math.min(pct,100)}%;transition:width .5s;"></div>
+          </div>
+        </div>
+        <span style="font-size:12px;font-weight:700;color:${cor};min-width:38px;text-align:right;">${pct}%${excedeu?' ⚠':''}</span>
+      </div>`;
+    }).join('')}
+  </div>`;
+
+  document.getElementById('cal-indicadores').innerHTML = html;
+}
+
+function rCal(){
+  rCalIndicadores();
+  document.getElementById('cal-titulo').textContent = MESES_PT[calMes] + ' ' + calAno;
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const primeiroDia = new Date(calAno, calMes, 1);
+  const ultimoDia   = new Date(calAno, calMes+1, 0);
+  const dowInicio   = primeiroDia.getDay();
+
+  let html = '<div style="background:#fff;border:1px solid var(--bd);border-radius:10px;padding:14px;">';
+  html += '<div class="cal-grid">';
+  DOWS_PT.forEach(d=>{ html+=`<div class="cal-dow">${d}</div>`; });
+  for(let i=0;i<dowInicio;i++) html+='<div class="cal-dia vazio"></div>';
+
+  let trab=0, naoTrab=0, feriados_cnt=0, fds_cnt=0;
+
+  for(let dia=1;dia<=ultimoDia.getDate();dia++){
+    const d = new Date(calAno,calMes,dia); d.setHours(0,0,0,0);
+    const ds = d.toISOString().slice(0,10);
+    const dw = d.getDay();
+    const eHoje  = d.getTime()===hoje.getTime();
+    const eFds   = dw===0||dw===6;
+    const eFer   = FERIADOS_SET.has(ds);
+    const eObra  = d>=OBRA_INI && d<=OBRA_FIM;
+    const eUtil  = eObra && !eFds && !eFer;
+    const manual = CAL_MANUAL[ds];
+
+    if(eObra){
+      if(manual==='trabalhado')          trab++;
+      else if(manual==='nao_trabalhado') naoTrab++;
+      else if(eFds)  fds_cnt++;
+      else if(eFer)  feriados_cnt++;
+      // útil sem marcação não conta como trabalhado
+    }
+
+    let cls='cal-dia', label='', title='';
+    if(manual==='trabalhado'){
+      cls+=' util'; label='TRAB.';
+    } else if(manual==='nao_trabalhado'){
+      cls+=' nao-trab'; label='NÃO TRAB.';
+    } else if(eHoje){
+      cls+=' hoje'; label='HOJE';
+    } else if(eFer){
+      cls+=' feriado'; label=FERIADOS_NOME[ds]||'FERIADO'; title=FERIADOS_NOME[ds]||'Feriado';
+    } else if(eFds){
+      cls+=' fds';
+    } else if(eUtil){
+      cls+=' util-neutro'; // útil mas não marcado — clicável, tom neutro
+    } else {
+      cls+=' fora';
+    }
+
+    if(eObra && !eFds && !eFer) cls+=' clicavel';
+
+    const labelHtml = label && label!=='HOJE'
+      ? `<span class="cal-dia-label">${label.length>9?label.slice(0,9)+'…':label}</span>` : '';
+
+    html+=`<div class="${cls}"${title?` title="${title}"`:''}${eObra&&!eFds&&!eFer?` onclick="calToggle('${ds}')"`:''}>
+      <span class="cal-dia-num">${dia}</span>${labelHtml}
+    </div>`;
+  }
+
+  const total=dowInicio+ultimoDia.getDate(), resto=total%7;
+  if(resto>0) for(let i=0;i<7-resto;i++) html+='<div class="cal-dia vazio"></div>';
+  html+='</div>';
+
+  // Resumo do mês
+  const blocoMes = (() => {
+    for(let dia=1;dia<=ultimoDia.getDate();dia++){
+      const d=new Date(calAno,calMes,dia); d.setHours(0,0,0,0);
+      const bi=blocoDodia(d.toISOString().slice(0,10));
+      if(bi>=0) return BLOCOS[bi].n;
+    }
+    return null;
+  })();
+
+  if(trab+naoTrab+feriados_cnt+fds_cnt>0){
+    html+=`<div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);align-items:center;">
+      ${blocoMes?`<span style="font-size:11px;font-weight:700;color:var(--M);text-transform:uppercase;">${blocoMes}</span><span style="color:var(--bd);">|</span>`:''}
+      <span style="font-size:12px;color:var(--ok);font-weight:700;">${trab} TRABALHADOS</span>
+      ${naoTrab>0?`<span style="font-size:12px;color:#b91c1c;font-weight:700;">${naoTrab} NÃO TRABALHADOS</span>`:''}
+      ${feriados_cnt>0?`<span style="font-size:12px;color:var(--err);font-weight:600;">${feriados_cnt} FERIADO${feriados_cnt>1?'S':''}</span>`:''}
+      <span style="font-size:12px;color:var(--mt);font-weight:600;">${fds_cnt} FDS</span>
+    </div>`;
+  } else {
+    html+=`<div style="font-size:12px;color:var(--mt);margin-top:10px;padding-top:10px;border-top:1px solid var(--bd);">Mês fora do período de execução da obra.</div>`;
+  }
+  html+='</div>';
+  document.getElementById('cal-body').innerHTML=html;
+}
+
+// ============================================================
+//  NAVEGAÇÃO
+// ============================================================
+function S(id,b){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.nb').forEach(x=>x.classList.remove('on'));
+  document.getElementById('sec-'+id).classList.add('on');
+  if(b)b.classList.add('on');
+}
+function oWA(){ window.open('https://wa.me/'+WA_NUM+'?text='+encodeURIComponent('Olá, estou acessando o portal da obra e gostaria de esclarecer uma dúvida.'),'_blank'); }
+
+// ============================================================
+//  INIT
+// ============================================================
+function initQR(){
+  try{ new QRCode(document.getElementById('qr-el'),{text:SITE_URL,width:120,height:120,colorDark:'#5C2444',colorLight:'#ffffff'}); }
+  catch(e){ document.getElementById('qr-el').innerHTML='<div style="font-size:10px;color:var(--mt);padding:8px;max-width:120px;word-break:break-all;">'+SITE_URL+'</div>'; }
+}
+
+rDash(); rBlocos(); rCrono(); rTL(); rCom(); rGal(); rCal(); initQR();
+</script>
+</body>
+</html>
