@@ -382,7 +382,7 @@ body{font-family:var(--fn);background:var(--bg);color:var(--tx);font-size:14px;}
     <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;"><div style="width:13px;height:13px;border-radius:3px;background:var(--err-bg);border:1px solid var(--err-b);"></div>FERIADO</div>
     <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;"><div style="width:13px;height:13px;border-radius:3px;background:#f1f5f9;border:1px solid #e2e8f0;"></div>FIM DE SEMANA</div>
     <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;"><div style="width:13px;height:13px;border-radius:3px;background:var(--MP);border:1px solid var(--MB);"></div>HOJE</div>
-    <div style="font-size:11px;color:var(--mt);margin-left:auto;align-self:center;">Clique para alternar: Trabalhado → Não trabalhado → Padrão</div>
+    <div style="font-size:11px;color:var(--mt);margin-left:auto;align-self:center;" id="cal-leg-dica" style="display:none;"></div>
   </div>
 </div>
 
@@ -1155,6 +1155,9 @@ function rCalIndicadores(){
 
 function rCal(){
   rCalIndicadores();
+  const isAdmin = document.getElementById('apanel').classList.contains('on');
+  const dica = document.getElementById('cal-leg-dica');
+  if(dica) dica.textContent = isAdmin ? 'Clique para alternar: Trabalhado → Não trabalhado → Padrão' : '';
   document.getElementById('cal-titulo').textContent = MESES_PT[calMes] + ' ' + calAno;
   const hoje = new Date(); hoje.setHours(0,0,0,0);
   const primeiroDia = new Date(calAno, calMes, 1);
