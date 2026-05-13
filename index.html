@@ -333,17 +333,26 @@ body{font-family:var(--fn);background:var(--bg);color:var(--tx);font-size:14px;}
 <nav class="nav">
   <div class="nav-tabs">
     <button class="nb on" onclick="S('dash',this)"><i class="ti ti-layout-dashboard"></i>Dashboard</button>
-    <button class="nb" onclick="S('blocos',this)"><i class="ti ti-grid-dots"></i>Blocos</button>
+    <button class="nb" onclick="S('com',this)"><i class="ti ti-notebook"></i>Diário de Obra</button>
+    <button class="nb" onclick="S('blocos',this)"><i class="ti ti-grid-dots"></i>Etapas da Obra</button>
     <button class="nb" onclick="S('crono',this)"><i class="ti ti-calendar"></i>Cronograma</button>
-    <button class="nb" onclick="S('cal',this)"><i class="ti ti-calendar-month"></i>Calendário</button>
     <button class="nb" onclick="S('tl',this)"><i class="ti ti-timeline"></i>Histórico</button>
-    <button class="nb" onclick="S('com',this)"><i class="ti ti-bell"></i>Comunicados</button>
+    <button class="nb" onclick="S('cal',this)"><i class="ti ti-calendar-month"></i>Calendário</button>
     <button class="nb" onclick="S('admin',this)" style="opacity:.35;" title="Painel administrativo"><i class="ti ti-settings"></i></button>
   </div>
 </nav>
 
 <!-- DASHBOARD -->
 <div class="sec on" id="sec-dash">
+  <!-- FAIXA INFORMATIVA -->
+  <div onclick="S('com', document.querySelector('.nb[onclick*=\"com\"]'))" style="background:var(--MP);border:1px solid var(--MB);border-radius:10px;padding:13px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .2s;" onmouseover="this.style.background='#f0e0e8'" onmouseout="this.style.background='var(--MP)'">
+    <i class="ti ti-notebook" style="font-size:22px;color:var(--M);flex-shrink:0;"></i>
+    <div style="flex:1;">
+      <div style="font-size:13px;font-weight:700;color:var(--M);">FOTOS E REGISTROS DA OBRA</div>
+      <div style="font-size:12px;color:var(--ML);margin-top:2px;">Acesse o <strong>Diário de Obra</strong> para ver as fotos das vistorias e os registros de acompanhamento.</div>
+    </div>
+    <i class="ti ti-arrow-right" style="font-size:16px;color:var(--M);flex-shrink:0;"></i>
+  </div>
   <div id="d-gpc"></div>
   <div class="kpi-g" id="d-kpi"></div>
   <p class="st" style="margin-bottom:12px;">RESUMO POR BLOCO</p>
@@ -352,7 +361,7 @@ body{font-family:var(--fn);background:var(--bg);color:var(--tx);font-size:14px;}
 
 <!-- BLOCOS -->
 <div class="sec" id="sec-blocos">
-  <p class="st">ETAPAS POR BLOCO</p>
+  <p class="st">ETAPAS DA OBRA</p>
   <p class="ss">Detalhamento técnico das atividades executadas e em andamento. Clique no bloco para expandir.</p>
   <div id="bl-list"></div>
 </div>
@@ -407,8 +416,8 @@ body{font-family:var(--fn);background:var(--bg);color:var(--tx);font-size:14px;}
 
 <!-- COMUNICADOS -->
 <div class="sec" id="sec-com">
-  <p class="st">COMUNICADOS AOS CONDÔMINOS</p>
-  <p class="ss">Interdições, ruídos previstos, ajustes de cronograma e informações gerais sobre a obra</p>
+  <p class="st">DIÁRIO DE OBRA</p>
+  <p class="ss">Registros diários, fotos de vistoria, avisos e acompanhamento do andamento da obra. Clique em qualquer registro para acessar as imagens.</p>
   <div id="com-bd"></div>
 </div>
 
@@ -455,19 +464,19 @@ body{font-family:var(--fn);background:var(--bg);color:var(--tx);font-size:14px;}
 
     <!-- 3. COMUNICADOS -->
     <div class="as">
-      <div class="as-title"><i class="ti ti-bell"></i>Publicar comunicado</div>
-      <div class="as-sub">O comunicado será exibido imediatamente na aba Comunicados. O link do Google Drive é opcional — aparece como botão para os condôminos acessarem as fotos.</div>
+      <div class="as-title"><i class="ti ti-notebook"></i>Publicar registro no Diário de Obra</div>
+      <div class="as-sub">O registro será exibido imediatamente no Diário de Obra. Cole o link da pasta do Google Drive para que os condôminos acessem as fotos diretamente.</div>
       <div style="display:flex;flex-direction:column;gap:10px;">
         <select class="asel" id="c-tipo" style="margin-bottom:0;"><option value="info">Informativo</option><option value="warn">Atenção / Interdição</option><option value="ok">Conclusão / Boa notícia</option></select>
-        <input class="ai" type="text" id="c-tit" placeholder="Título — ex: Vistoria 12/05/2026 — Bloco 1" style="text-align:left;margin-bottom:0;">
+        <input class="ai" type="text" id="c-tit" placeholder="Ex: Vistoria 12/05/2026 — Bloco 1 · Recuperação estrutural iniciada" style="text-align:left;margin-bottom:0;">
         <textarea id="c-txt" placeholder="Descrição do que foi realizado na vistoria ou obra…" style="width:100%;padding:10px 12px;border:1.5px solid var(--bd);border-radius:7px;font-size:13px;font-family:var(--fn);height:80px;resize:vertical;"></textarea>
         <input class="ai" type="text" id="c-link" placeholder="📎 Link do Google Drive com as fotos (opcional)" style="text-align:left;margin-bottom:0;">
-        <button class="btn-M" onclick="addC()"><i class="ti ti-plus"></i> PUBLICAR COMUNICADO</button>
+        <button class="btn-M" onclick="addC()"><i class="ti ti-plus"></i> PUBLICAR NO DIÁRIO</button>
         <p id="c-msg" style="font-size:13px;color:var(--ok);min-height:18px;text-align:center;font-weight:600;"></p>
       </div>
 
       <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--bd);">
-        <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mt);margin-bottom:10px;">COMUNICADOS PUBLICADOS</p>
+        <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mt);margin-bottom:10px;">REGISTROS PUBLICADOS</p>
         <div id="admin-com-lista"></div>
       </div>
     </div>
@@ -611,7 +620,7 @@ const SPILL    = {concluido:'p-ok', andamento:'p-wip', pendente:'p-pend', atraso
 const FILL_CLS = {concluido:'f-ok', andamento:'f-wip', pendente:'', aguardando:'f-G', atraso:'f-M'};
 
 let COMS  = [
-  {t:'info', d:'12/05/2026', h:'Início da obra — Bloco 1', p:'Os serviços de recuperação estrutural e pintura foram iniciados no Bloco 1 (Box 68 ao Box 73). O canteiro de obras está mobilizado e os trabalhos ocorrem dentro do horário regulamentar, de segunda a sexta-feira.'},
+  {t:'info', d:'12/05/2026', h:'Início da obra — Bloco 1', p:'Os serviços de recuperação estrutural e pintura foram iniciados no Bloco 1 (Box 68 ao Box 73). O canteiro de obras está mobilizado e os trabalhos ocorrem dentro do horário regulamentar, de segunda a sexta-feira.', link:'https://drive.google.com/drive/folders/1BdujKSWLtzJo__2ksdeapzdGUGE42sqH?usp=drive_link'},
 ];
 const TLV = [
   {s:'wip',  d:'MAI 2026', h:'Início da obra — Bloco 1',   p:'Mobilização da equipe. Início dos serviços de recuperação estrutural e revestimento nos Box 68 ao Box 73.'},
@@ -831,7 +840,7 @@ function rCom(){
       </div>
       <div class="cc-h">${c.h}</div>
       <div class="cc-p">${c.p}</div>
-      ${c.link?`<a href="${c.link}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:var(--MP);border:1px solid var(--MB);border-radius:7px;font-size:12px;font-weight:600;color:var(--M);text-decoration:none;"><i class="ti ti-photo" style="font-size:14px;"></i> VER FOTOS NO GOOGLE DRIVE</a>`:''}
+      ${c.link?`<a href="${c.link}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:var(--MP);border:1px solid var(--MB);border-radius:7px;font-size:12px;font-weight:600;color:var(--M);text-decoration:none;"><i class="ti ti-photo" style="font-size:14px;"></i> VER FOTOS DA VISTORIA</a>`:''}
     </div>`).join('');
   rAdminComs();
 }
