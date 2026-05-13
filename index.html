@@ -1067,6 +1067,10 @@ function calNav(dir){
 }
 
 function calToggle(ds){
+  // Somente admin logado pode marcar dias
+  if(!document.getElementById('apanel').classList.contains('on')){
+    return;
+  }
   const atual = CAL_MANUAL[ds];
   if(!atual)                        CAL_MANUAL[ds] = 'trabalhado';
   else if(atual==='trabalhado')     CAL_MANUAL[ds] = 'nao_trabalhado';
@@ -1200,12 +1204,13 @@ function rCal(){
       cls+=' fora';
     }
 
-    if(eObra && !eFds && !eFer) cls+=' clicavel';
+    const isAdmin = document.getElementById('apanel').classList.contains('on');
+    if(eObra && !eFds && !eFer && isAdmin) cls+=' clicavel';
 
     const labelHtml = label && label!=='HOJE'
       ? `<span class="cal-dia-label">${label.length>9?label.slice(0,9)+'…':label}</span>` : '';
 
-    html+=`<div class="${cls}"${title?` title="${title}"`:''}${eObra&&!eFds&&!eFer?` onclick="calToggle('${ds}')"`:''}>
+    html+=`<div class="${cls}"${title?` title="${title}"`:''}${eObra&&!eFds&&!eFer&&isAdmin?` onclick="calToggle('${ds}')"`:''}>
       <span class="cal-dia-num">${dia}</span>${labelHtml}
     </div>`;
   }
