@@ -1064,16 +1064,24 @@ function calNav(dir){
 }
 
 function calToggle(ds){
-  // Somente admin logado pode marcar dias
-  if(!document.getElementById('apanel').classList.contains('on')){
-    return;
-  }
+  if(!document.getElementById('apanel').classList.contains('on')) return;
   const atual = CAL_MANUAL[ds];
   if(!atual)                        CAL_MANUAL[ds] = 'trabalhado';
   else if(atual==='trabalhado')     CAL_MANUAL[ds] = 'nao_trabalhado';
   else                              delete CAL_MANUAL[ds];
   rCal(); salvarFirebase();
 }
+// Expõe todas as funções chamadas pelo HTML no escopo global
+window.calToggle  = calToggle;
+window.calNav     = calNav;
+window.tog        = tog;
+window.chkPwd     = chkPwd;
+window.logout     = logout;
+window.saveStatus = saveStatus;
+window.saveMed    = saveMed;
+window.addC       = addC;
+window.delCom     = delCom;
+window.oWA        = oWA;
 
 function rCalIndicadores(){
   const dados = contarDiasPorBloco();
