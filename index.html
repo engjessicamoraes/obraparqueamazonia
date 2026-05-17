@@ -863,6 +863,7 @@ function chkPwd(){
     renderAdminTable();
     populateSels();
     rAdminComs();
+    rCal(); // atualiza calendário com permissões de admin
   } else {
     document.getElementById('pwd-err').textContent='Senha incorreta. Tente novamente.';
   }
@@ -1260,8 +1261,9 @@ function S(id,b){
   document.querySelectorAll('.nb').forEach(x=>x.classList.remove('on'));
   document.getElementById('sec-'+id).classList.add('on');
   if(b)b.classList.add('on');
+  // Rechama rCal ao abrir o calendário para aplicar permissões de admin
+  if(id==='cal') rCal();
 }
-window.S = S;
 
 function irDiario(){
   const btn = document.querySelector('.nb[onclick*="com"]');
