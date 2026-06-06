@@ -1069,17 +1069,19 @@ const CAL_MANUAL = {};
 
 let calAno = 2026, calMes = 4;
 
-// Retorna qual bloco (índice 0-8) um dia pertence pelo cronograma contratual
-// Retorna -1 se fora do período
+// Retorna qual bloco (índice 0-8) um dia pertence pelo cronograma contratual.
+// Quando blocos se sobrepõem (ex: B2 iniciou antes de B1 terminar),
+// prevalece o bloco com data de início mais recente (maior índice).
+// Retorna -1 se fora do período de qualquer bloco.
 function blocoDodia(ds){
   const d = new Date(ds+'T00:00:00');
+  let resultado = -1;
   for(let i=0;i<BLOCOS.length;i++){
     const ini = new Date(BLOCOS[i].ini+'T00:00:00');
-    // fim contratual: calcular a partir do ini + dias úteis
     const fim = fimContratual(i);
-    if(d >= ini && d <= fim) return i;
+    if(d >= ini && d <= fim) resultado = i; // sobrescreve: prevalece o último (mais recente)
   }
-  return -1;
+  return resultado;
 }
 
 // Cache dos fins contratuais calculados
@@ -1148,14 +1150,36 @@ function rCalIndicadores(){
   const pctGlobal    = Math.round((totalTrab/totalContrat)*100);
   const atrasoBlocos = dados.filter((d,i)=>d.trab+d.naoTrab>0 && d.trab+d.naoTrab > d.contratual).length;
 
-  // Projeta data de conclusão com base no ritmo atual
+  // Projeta data de conclusão:
+  // Conta os dias úteis que ainda restam no cronograma contratual de cada bloco
+  // (dias dentro do período previsto que ainda não foram marcados como trabalhados),
+  // depois soma a partir de hoje para encontrar a data projetada.
+  // Se todos os dias já foram marcados ou a obra concluiu, mostra a data contratual.
   let projecao = '—';
-  if(totalTrab > 0){
-    const diasRestContrat = totalContrat - totalTrab;
-    // data de hoje + dias restantes em dias úteis
-    let c = new Date(); c.setHours(0,0,0,0);
+  const hoje_proj = new Date(); hoje_proj.setHours(0,0,0,0);
+  let diasRestantes = 0;
+  BLOCOS.forEach(function(b, i){
+    const ini = new Date(b.ini+'T00:00:00');
+    const fim = fimContratual(i);
+    // Percorrer apenas os dias futuros dentro do período do bloco
+    const start = new Date(Math.max(hoje_proj.getTime(), ini.getTime()));
+    let cc = new Date(start);
+    while(cc <= fim){
+      const dw=cc.getDay(), ds=cc.toISOString().slice(0,10);
+      // Conta dia útil que ainda não foi marcado como trabalhado
+      if(dw>0&&dw<6&&!FERIADOS_SET.has(ds)&&CAL_MANUAL[ds]!=='trabalhado') diasRestantes++;
+      cc.setDate(cc.getDate()+1);
+    }
+  });
+  // Só exibe projeção quando há pelo menos uma marcação (trabalhado ou não trabalhado)
+  if((totalTrab + totalNao) > 0){
+    // Projeção = hoje + dias futuros restantes do cronograma + dias não trabalhados (atraso a repor)
+    // diasRestantes = dias úteis futuros do cronograma ainda não marcados como trabalhados
+    // totalNao      = dias explicitamente perdidos que precisam ser repostos ao final
+    const totalAvançar = diasRestantes + totalNao;
+    let c = new Date(hoje_proj);
     let cont = 0;
-    while(cont < diasRestContrat){
+    while(cont < totalAvançar){
       c.setDate(c.getDate()+1);
       const dw=c.getDay(), ds=c.toISOString().slice(0,10);
       if(dw>0&&dw<6&&!FERIADOS_SET.has(ds)) cont++;
@@ -1163,8 +1187,14 @@ function rCalIndicadores(){
     projecao = c.toLocaleDateString('pt-BR');
   }
 
-  const statusCor = atrasoBlocos > 0 ? 'var(--err)' : totalTrab > 0 ? 'var(--ok)' : 'var(--mt)';
-  const statusTxt = atrasoBlocos > 0 ? `${atrasoBlocos} BLOCO(S) COM DIAS EXCEDIDOS` : totalTrab > 0 ? 'NO PRAZO' : 'OBRA NÃO INICIADA';
+  // Status considera: dias não trabalhados atrasam a obra
+  const temAtraso = totalNao > 0 || atrasoBlocos > 0;
+  const statusCor = temAtraso ? 'var(--err)' : totalTrab > 0 ? 'var(--ok)' : 'var(--mt)';
+  const statusTxt = atrasoBlocos > 0
+    ? atrasoBlocos+' BLOCO(S) COM DIAS EXCEDIDOS'
+    : totalNao > 0
+      ? totalNao+' DIA(S) NÃO TRABALHADO(S)'
+      : totalTrab > 0 ? 'NO PRAZO' : 'OBRA NÃO INICIADA';
 
   let html = `<div style="background:#fff;border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:4px;">
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mt);margin-bottom:12px;">CONTROLE GLOBAL DA OBRA</div>
