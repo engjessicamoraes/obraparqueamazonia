@@ -561,23 +561,26 @@ const SITE_URL = 'https://engjessicamoraes.github.io/obraparqueamazonia';
 // ============================================================
 //  ETAPAS TÉCNICAS — definição com unidade
 //  tipo: 'm2' | 'un' | 'status'
+//  cod: letra de referência conforme planilha de levantamento
 // ============================================================
 const ETAPAS = [
-  {id:1,  n:'Preparação e isolamento do canteiro de obras',                         tipo:'status'},
-  {id:2,  n:'Limpeza e lavagem hidráulica das superfícies',                         tipo:'m2'},
-  {id:3,  n:'Remoção das calhas e tampas de inspeção',                              tipo:'un'},
-  {id:4,  n:'Inspeção e mapeamento das manifestações patológicas',                  tipo:'un'},
-  {id:5,  n:'Remoção do concreto deteriorado e exposição das armaduras',            tipo:'un'},
-  {id:6,  n:'Tratamento de limpeza e desoxidação das armaduras',                    tipo:'un'},
-  {id:7,  n:'Aplicação de inibidor de corrosão nas armaduras',                      tipo:'un'},
-  {id:8,  n:'Recomposição do cobrimento com argamassa de reparo estrutural',        tipo:'un'},
-  {id:9,  n:'Regularização e preparo da base para pintura',                         tipo:'m2'},
-  {id:10, n:'Pintura do teto — 1ª demão',                                           tipo:'m2'},
-  {id:11, n:'Pintura do teto — 2ª demão',                                           tipo:'m2'},
-  {id:12, n:'Pintura de paredes — 1ª demão',                                        tipo:'m2'},
-  {id:13, n:'Pintura de paredes — 2ª demão',                                        tipo:'m2'},
-  {id:14, n:'Pintura de detalhes e acabamentos',                                    tipo:'m2'},
-  {id:15, n:'Pintura de delimitação das vagas',                                     tipo:'m2'},
+  {id:1,  cod:'A', n:'Preparação e isolamento do canteiro de obras',                              tipo:'status'},
+  {id:2,  cod:'B', n:'Lavagem hidráulica das superfícies',                                        tipo:'m2'},
+  {id:3,  cod:'C', n:'Remoção das calhas',                                                        tipo:'un'},
+  {id:4,  cod:'D', n:'Remoção do concreto deteriorado e exposição das armaduras',                 tipo:'un'},
+  {id:5,  cod:'E', n:'Tratamento de limpeza e desoxidação das armaduras',                         tipo:'un'},
+  {id:6,  cod:'F', n:'Aplicação de inibidor de corrosão nas armaduras',                           tipo:'un'},
+  {id:7,  cod:'G', n:'Recomposição do cobrimento com argamassa de reparo estrutural',             tipo:'m2'},
+  {id:8,  cod:'H', n:'Aplicação de fundo preparador',                                             tipo:'m2'},
+  {id:9,  cod:'I', n:'Pintura do teto — 1ª demão',                                               tipo:'m2'},
+  {id:10, cod:'J', n:'Pintura do teto — 2ª demão',                                               tipo:'m2'},
+  {id:11, cod:'K', n:'Pintura de paredes — 1ª demão',                                            tipo:'m2'},
+  {id:12, cod:'L', n:'Pintura de paredes — 2ª demão',                                            tipo:'m2'},
+  {id:13, cod:'M', n:'Pintura dos pilares e colunas',                                             tipo:'m2'},
+  {id:14, cod:'N', n:'Pintura das portas',                                                        tipo:'m2'},
+  {id:15, cod:'O', n:'Recomposição das paredes em cima das portas dos transformadores',           tipo:'m2'},
+  {id:16, cod:'P', n:'Pintura de delimitação das vagas',                                          tipo:'m2'},
+  {id:17, cod:'Q', n:'Limpeza do local',                                                          tipo:'status'},
 ];
 
 const UNIDADE_LABEL = {m2:'m²', un:'un', status:'—'};
@@ -597,9 +600,33 @@ const BLOCOS = [
   {id:9, n:'BLOCO 9', v:'Box 62, 63, 64 ao 67',                                      d:50, ini:'2027-06-11', fim:'19/08/2027', st:'pendente'},
 ];
 
-// Estado das medições: [blocoIdx][etapaIdx] = {total, exec, statusSimples}
-const MED = BLOCOS.map(() =>
-  ETAPAS.map(e => e.tipo === 'status' ? {statusSimples:'pendente'} : {total:0, exec:0})
+// ============================================================
+//  LEVANTAMENTO INICIAL — totais por bloco e etapa
+//  Ordem das colunas segue a ordem de ETAPAS: A B C D E F G H I J K L M N O P Q
+//  Inteiro = unidade (un) | Decimal = m²  |  'S' = etapa de status (sem medição numérica)
+// ============================================================
+const LEV_INICIAL = [
+  //         A    B       C  D  E  F  G       H       I       J       K       L       M      N      O      P      Q
+  /* B1 */ ['S', 394.77, 3, 3, 3, 3, 394.77, 394.77, 303.07, 303.07, 24.10,  24.10,  67.61, 0,     0,     20.79, 'S'],
+  /* B2 */ ['S', 602.90, 3, 3, 3, 3, 602.90, 602.90, 338.02, 338.02, 192.51, 192.51, 72.37, 13.06, 13.06, 17.90, 'S'],
+  /* B3 */ ['S', 344.63, 3, 3, 3, 3, 344.63, 344.63, 215.93, 215.93, 116.21, 116.21, 12.49, 0.90,  0.90,  13.33, 'S'],
+  /* B4 */ ['S', 338.82, 3, 3, 3, 3, 338.82, 338.82, 207.78, 207.78, 70.69,  70.69,  60.35, 0,     0,     15.81, 'S'],
+  /* B5 */ ['S', 393.77, 3, 3, 3, 3, 393.77, 393.77, 254.41, 254.41, 121.34, 121.34, 18.03, 0,     0,     16.80, 'S'],
+  /* B6 */ ['S', 382.24, 3, 3, 3, 3, 382.24, 382.24, 249.13, 249.13, 111.80, 111.80, 21.31, 0,     0,     16.89, 'S'],
+  /* B7 */ ['S', 418.22, 3, 3, 3, 3, 418.22, 418.22, 258.76, 258.76, 113.43, 113.43, 46.03, 0,     0,     14.23, 'S'],
+  /* B8 */ ['S', 311.26, 3, 3, 3, 3, 311.26, 311.26, 224.14, 224.14, 56.42,  56.42,  30.70, 14.60, 14.60, 9.21,  'S'],
+  /* B9 */ ['S', 366.43, 3, 3, 3, 3, 366.43, 366.43, 247.78, 247.78, 84.43,  84.43,  34.22, 1.80,  1.80,  10.85, 'S'],
+];
+
+// Estado das medicoes: [blocoIdx][etapaIdx] = {total, exec, statusSimples}
+// Totais pre-carregados com o levantamento inicial — editaveis pelo admin
+const MED = BLOCOS.map((b, bi) =>
+  ETAPAS.map((e, ei) => {
+    const v = LEV_INICIAL[bi] ? LEV_INICIAL[bi][ei] : null;
+    if(e.tipo === 'status') return {statusSimples:'pendente'};
+    const tot = (typeof v === 'number') ? v : 0;
+    return {total: tot, exec: 0};
+  })
 );
 
 const ST_OPTS  = ['concluido','andamento','pendente','aguardando','atraso'];
@@ -743,7 +770,7 @@ function rBlocos(){
       if(e.tipo === 'status'){
         const st = m.statusSimples || 'pendente';
         return `<div class="et-status-row">
-          <span class="et-num">${e.id.toString().padStart(2,'0')}</span>
+          <span class="et-num">${e.cod}</span>
           <span style="flex:1;font-size:12.5px;font-weight:500;">${e.n}</span>
           <span class="pill ${pillCls(st)}">${SL[st]}</span>
         </div>`;
@@ -754,9 +781,11 @@ function rBlocos(){
       const unit  = UNIDADE_LABEL[e.tipo];
       const col   = pct===100?'var(--ok)':pct>0?'var(--wip)':'var(--pend)';
       const stPct = pct===100?'concluido':pct>0?'andamento':'pendente';
+      const execFmt = e.tipo==='m2' ? exec.toFixed(2) : exec;
+      const totFmt  = e.tipo==='m2' ? (total>0?total.toFixed(2):'—') : (total>0?total:'—');
       return `<div class="et-row">
         <div class="et-top">
-          <span class="et-num">${e.id.toString().padStart(2,'0')}</span>
+          <span class="et-num">${e.cod}</span>
           <span class="et-nome">${e.n}</span>
           <div class="et-right">
             <span class="et-medida">${unit}</span>
@@ -766,8 +795,8 @@ function rBlocos(){
         </div>
         <div class="et-bar"><div class="et-fill" style="width:${pct}%;background:${col};opacity:.85;"></div></div>
         <div class="et-valores">
-          <span class="et-val">Executado: <strong>${exec} ${unit}</strong></span>
-          <span class="et-val">Total previsto: <strong>${total > 0 ? total+' '+unit : '—'}</strong></span>
+          <span class="et-val">Executado: <strong>${execFmt} ${unit}</strong></span>
+          <span class="et-val">Total previsto: <strong>${totFmt}${total>0?' '+unit:''}</strong></span>
         </div>
       </div>`;
     }).join('');
@@ -909,35 +938,40 @@ function populateSels(){
 }
 
 function rMed(){
-  const bi=parseInt(document.getElementById('a-bsel').value);
-  const wrap=document.getElementById('med-save');
+  var bi=parseInt(document.getElementById('a-bsel').value);
+  var wrap=document.getElementById('med-save');
   if(isNaN(bi)){ document.getElementById('med-body').innerHTML=''; wrap.style.display='none'; return; }
   wrap.style.display='block';
-  document.getElementById('med-body').innerHTML=`<div style="background:var(--bg);border-radius:10px;padding:12px;">
-    ${ETAPAS.map((e,ei)=>{
-      const m=MED[bi][ei];
-      const unit=UNIDADE_LABEL[e.tipo];
-      if(e.tipo==='status'){
-        return `<div class="med-row">
-          <span style="font-size:10px;font-weight:700;color:var(--M);background:var(--MP);border-radius:4px;padding:2px 6px;flex-shrink:0;">${e.id.toString().padStart(2,'0')}</span>
-          <span class="med-nome">${e.n}</span>
-          <select class="med-status-sel" id="med-st-${bi}-${ei}">
-            ${ST_OPTS.map(o=>`<option value="${o}"${(m.statusSimples||'pendente')===o?' selected':''}>${SL[o]}</option>`).join('')}
-          </select>
-        </div>`;
-      }
-      return `<div class="med-row">
-        <span style="font-size:10px;font-weight:700;color:var(--M);background:var(--MP);border-radius:4px;padding:2px 6px;flex-shrink:0;">${e.id.toString().padStart(2,'0')}</span>
-        <span class="med-nome">${e.n}</span>
-        <span class="med-unit">${unit}</span>
-        <input class="med-inp" type="number" min="0" id="med-exec-${bi}-${ei}" value="${m.exec||0}" placeholder="0">
-        <span class="med-sep">de</span>
-        <input class="med-inp" type="number" min="0" id="med-tot-${bi}-${ei}" value="${m.total||0}" placeholder="total">
-      </div>`;
-    }).join('')}
-  </div>`;
+  var html='<div style="background:var(--bg);border-radius:10px;padding:12px;">';
+  html+='<div style="font-size:10px;color:var(--mt);margin-bottom:10px;padding:8px 10px;background:#fff;border-radius:6px;border:1px solid var(--bd);">';
+  html+='<strong style="color:var(--M);">EXECUTADO</strong> = quantidade já realizada &nbsp;|&nbsp; ';
+  html+='<strong style="color:var(--G);">TOTAL</strong> = levantamento do bloco (editável conforme medição em campo)</div>';
+  ETAPAS.forEach(function(e,ei){
+    var m=MED[bi][ei];
+    var unit=UNIDADE_LABEL[e.tipo];
+    var isDecimal=(e.tipo==='m2');
+    var step=isDecimal?'0.01':'1';
+    var badge='<span style="font-size:10px;font-weight:700;color:var(--M);background:var(--MP);border-radius:4px;padding:2px 6px;flex-shrink:0;min-width:26px;text-align:center;">'+e.cod+'</span>';
+    if(e.tipo==='status'){
+      var stVal=m.statusSimples||'pendente';
+      var opts=ST_OPTS.map(function(o){ return '<option value="'+o+'"'+(stVal===o?' selected':'')+'>'+SL[o]+'</option>'; }).join('');
+      html+='<div class="med-row">'+badge+'<span class="med-nome">'+e.n+'</span>';
+      html+='<select class="med-status-sel" id="med-st-'+bi+'-'+ei+'">'+opts+'</select></div>';
+    } else {
+      var totFmt=isDecimal?parseFloat(m.total||0).toFixed(2):(m.total||0);
+      var execFmt=isDecimal?parseFloat(m.exec||0).toFixed(2):(m.exec||0);
+      html+='<div class="med-row">'+badge+'<span class="med-nome">'+e.n+'</span>';
+      html+='<span class="med-unit">'+unit+'</span>';
+      html+='<span style="font-size:10px;color:var(--ok);font-weight:700;white-space:nowrap;">EXEC.</span>';
+      html+='<input class="med-inp" type="number" min="0" step="'+step+'" id="med-exec-'+bi+'-'+ei+'" value="'+execFmt+'" placeholder="0" style="border-color:var(--ok-b);">';
+      html+='<span class="med-sep">de</span>';
+      html+='<span style="font-size:10px;color:var(--G);font-weight:700;white-space:nowrap;">TOTAL</span>';
+      html+='<input class="med-inp" type="number" min="0" step="'+step+'" id="med-tot-'+bi+'-'+ei+'" value="'+totFmt+'" placeholder="total" style="border-color:var(--GB);"></div>';
+    }
+  });
+  html+='</div>';
+  document.getElementById('med-body').innerHTML=html;
 }
-
 function saveMed(){
   const bi=parseInt(document.getElementById('a-bsel').value);
   if(isNaN(bi)) return;
@@ -948,8 +982,8 @@ function saveMed(){
     } else {
       const exec=document.getElementById('med-exec-'+bi+'-'+ei);
       const tot =document.getElementById('med-tot-'+bi+'-'+ei);
-      if(exec) MED[bi][ei].exec=Math.max(0,parseInt(exec.value)||0);
-      if(tot)  MED[bi][ei].total=Math.max(0,parseInt(tot.value)||0);
+      if(exec) MED[bi][ei].exec=Math.max(0,parseFloat(exec.value)||0);
+      if(tot)  MED[bi][ei].total=Math.max(0,parseFloat(tot.value)||0);
     }
   });
   rDash(); rBlocos(); rCrono();
