@@ -462,25 +462,7 @@ body{font-family:var(--fn);background:var(--bg);color:var(--tx);font-size:14px;}
       </div>
     </div>
 
-    <!-- 2b. ETAPA GLOBAL T — PISO -->
-    <div class="as">
-      <div class="as-title"><i class="ti ti-paint"></i>Etapa global — Pintura do piso (T)</div>
-      <div class="as-sub">Executada após a conclusão de todos os blocos. Informe o total levantado e o executado.</div>
-      <div style="background:var(--bg);border-radius:10px;padding:14px;">
-        <div class="med-row">
-          <span style="font-size:10px;font-weight:700;color:var(--G);background:var(--GP);border-radius:4px;padding:2px 6px;flex-shrink:0;min-width:26px;text-align:center;">T</span>
-          <span class="med-nome">Pintura do piso do caminho de circulação (carrinho)</span>
-          <span class="med-unit">m²</span>
-          <span style="font-size:10px;color:var(--ok);font-weight:700;white-space:nowrap;">EXEC.</span>
-          <input class="med-inp" type="number" min="0" step="0.01" id="med-t-exec" value="0" style="border-color:var(--ok-b);">
-          <span class="med-sep">de</span>
-          <span style="font-size:10px;color:var(--G);font-weight:700;white-space:nowrap;">TOTAL</span>
-          <input class="med-inp" type="number" min="0" step="0.01" id="med-t-tot" value="0" style="border-color:var(--GB);">
-        </div>
-      </div>
-      <button class="btn-sv" onclick="saveMedT()" style="margin-top:12px;"><i class="ti ti-device-floppy"></i> SALVAR ETAPA T</button>
-      <p class="sv-msg" id="sv-t-msg"></p>
-    </div>
+
 
     <!-- 3. COMUNICADOS -->
     <div class="as">
@@ -584,31 +566,30 @@ const SITE_URL = 'https://engjessicamoraes.github.io/obraparqueamazonia';
 //  cod: letra de referência conforme planilha de levantamento
 // ============================================================
 const ETAPAS = [
-  {id:1,  cod:'A', n:'Preparação e isolamento do canteiro de obras',                              tipo:'status'},
+  {id:1,  cod:'A', n:'Mobilização, preparação e isolamento do canteiro de obras',                              tipo:'status'},
   {id:2,  cod:'B', n:'Lavagem hidráulica das superfícies',                                        tipo:'m2'},
   {id:3,  cod:'C', n:'Remoção das calhas',                                                        tipo:'un'},
   {id:4,  cod:'D', n:'Remoção do concreto deteriorado e exposição das armaduras',                 tipo:'un'},
   {id:5,  cod:'E', n:'Tratamento de limpeza e desoxidação das armaduras',                         tipo:'un'},
   {id:6,  cod:'F', n:'Aplicação de inibidor de corrosão nas armaduras',                           tipo:'un'},
   {id:7,  cod:'G', n:'Recomposição do cobrimento com argamassa de reparo estrutural',             tipo:'m2'},
-  {id:8,  cod:'H', n:'Aplicação de fundo preparador',                                             tipo:'m2'},
+  {id:8,  cod:'H', n:'Aplicação de fundo preparador e selador de superfícies',                                             tipo:'m2'},
   {id:9,  cod:'I', n:'Pintura do teto — 1ª demão',                                               tipo:'m2'},
   {id:10, cod:'J', n:'Pintura do teto — 2ª demão',                                               tipo:'m2'},
   {id:11, cod:'K', n:'Pintura de paredes — 1ª demão',                                            tipo:'m2'},
   {id:12, cod:'L', n:'Pintura de paredes — 2ª demão',                                            tipo:'m2'},
   {id:13, cod:'M', n:'Pintura dos pilares e colunas',                                             tipo:'m2'},
-  {id:14, cod:'N', n:'Pintura das portas',                                                        tipo:'m2',     blocos:[1,7]}, // índices 1=B2, 7=B8
-  {id:15, cod:'O', n:'Recomposição das paredes em cima das portas dos transformadores',           tipo:'m2',     blocos:[1,7]}, // índices 1=B2, 7=B8
+  {id:14, cod:'N', n:'Pintura das portas dos transformadores',                                                        tipo:'m2',     blocos:[1,7]}, // índices 1=B2, 7=B8
+  {id:15, cod:'O', n:'Recomposição do revestimento argamassado sobre as vergas das portas dos transformadores',           tipo:'m2',     blocos:[1,7]}, // índices 1=B2, 7=B8
   {id:16, cod:'P', n:'Pintura de delimitação das vagas',                                          tipo:'m2'},
-  {id:17, cod:'R', n:'Pintura da numeração das vagas',                                            tipo:'un'},
+  {id:17, cod:'R', n:'Demarcação e pintura da identificação numérica das vagas de estacionamento',                                            tipo:'un'},
   {id:18, cod:'S', n:'Instalação de pontos de iluminação',                                        tipo:'un'},
-  {id:19, cod:'Q', n:'Limpeza do local — fechamento do bloco',                                    tipo:'status'},
+  {id:19, cod:'T1', n:'Recuperação estrutural do piso do corredor de circulação de veículos',              tipo:'m2',     blocos:[9]},
+  {id:20, cod:'T2', n:'Pintura de demarcação do corredor de circulação de veículos',                   tipo:'m2',     blocos:[9]},
+  {id:21, cod:'Q',  n:'Limpeza geral e desmobilização do canteiro — fechamento do bloco',                                tipo:'status'},
 ];
 
-// Etapa global — executada uma única vez após conclusão de todos os blocos
-const ETAPA_GLOBAL_T = {id:20, cod:'T', n:'Pintura do piso do caminho de circulação (carrinho)', tipo:'m2'};
-// Estado da etapa global T: {total, exec}
-const MED_GLOBAL_T = {total:0, exec:0};
+// T1 e T2 (índices 18 e 19): exclusivas do Bloco 10 (índice 9) — campo blocos:[9]
 
 const UNIDADE_LABEL = {m2:'m²', un:'un', status:'—'};
 
@@ -624,7 +605,8 @@ const BLOCOS = [
   {id:6, n:'BLOCO 6', v:'Box 33 ao Box 44',                                           d:40, ini:'2026-12-30', fim:'01/03/2027', st:'pendente'},
   {id:7, n:'BLOCO 7', v:'Box 45 ao Box 52 · Duplo até o fundo',                       d:35, ini:'2027-03-02', fim:'20/04/2027', st:'pendente'},
   {id:8, n:'BLOCO 8', v:'Box 53 ao Box 60 · Box 61 ao lado do Portão 1 (P1)',        d:35, ini:'2027-04-22', fim:'10/06/2027', st:'pendente'},
-  {id:9, n:'BLOCO 9', v:'Box 62, 63, 64 ao 67',                                      d:50, ini:'2027-06-11', fim:'19/08/2027', st:'pendente'},
+  {id:9,  n:'BLOCO 9',  v:'Box 62, 63, 64 ao 67',                                     d:50, ini:'2027-06-11', fim:'19/08/2027', st:'pendente'},
+  {id:10, n:'BLOCO 10', v:'Caminho de circulação — recuperação e pintura do piso',    d:15, ini:'2027-08-20', fim:'10/09/2027', st:'pendente'},
 ];
 
 // ============================================================
@@ -635,15 +617,16 @@ const BLOCOS = [
 const LEV_INICIAL = [
   //         A    B       C  D  E  F  G       H       I       J       K       L       M      N       O       P      R   S   Q
   //                                                                                   (só B2/B8)           vagas  ilum fech.
-  /* B1 */ ['S', 394.77, 3, 3, 3, 3, 394.77, 394.77, 303.07, 303.07, 24.10,  24.10,  67.61, 0,      0,      20.79, 11, 8, 'S'],
-  /* B2 */ ['S', 602.90, 3, 3, 3, 3, 602.90, 602.90, 338.02, 338.02, 192.51, 192.51, 72.37, 13.06,  13.06,  17.90, 11, 8, 'S'],
-  /* B3 */ ['S', 344.63, 3, 3, 3, 3, 344.63, 344.63, 215.93, 215.93, 116.21, 116.21, 12.49, 0,      0,      13.33, 11, 8, 'S'],
-  /* B4 */ ['S', 338.82, 3, 3, 3, 3, 338.82, 338.82, 207.78, 207.78, 70.69,  70.69,  60.35, 0,      0,      15.81,  8, 8, 'S'],
-  /* B5 */ ['S', 393.77, 3, 3, 3, 3, 393.77, 393.77, 254.41, 254.41, 121.34, 121.34, 18.03, 0,      0,      16.80, 10, 8, 'S'],
-  /* B6 */ ['S', 382.24, 3, 3, 3, 3, 382.24, 382.24, 249.13, 249.13, 111.80, 111.80, 21.31, 0,      0,      16.89, 12, 8, 'S'],
-  /* B7 */ ['S', 418.22, 3, 3, 3, 3, 418.22, 418.22, 258.76, 258.76, 113.43, 113.43, 46.03, 0,      0,      14.23,  9, 8, 'S'],
-  /* B8 */ ['S', 311.26, 3, 3, 3, 3, 311.26, 311.26, 224.14, 224.14, 56.42,  56.42,  30.70, 14.60,  14.60,  9.21,   9, 8, 'S'],
-  /* B9 */ ['S', 366.43, 3, 3, 3, 3, 366.43, 366.43, 247.78, 247.78, 84.43,  84.43,  34.22, 0,      0,      10.85,  6, 8, 'S'],
+  /* B1  */ ['S', 394.77, 3, 3, 3, 3, 394.77, 394.77, 303.07, 303.07, 24.10,  24.10,  67.61, 0,      0,      20.79, 11, 8, 0,      0,      'S'],
+  /* B2  */ ['S', 602.90, 3, 3, 3, 3, 602.90, 602.90, 338.02, 338.02, 192.51, 192.51, 72.37, 13.06,  13.06,  17.90, 11, 8, 0,      0,      'S'],
+  /* B3  */ ['S', 344.63, 3, 3, 3, 3, 344.63, 344.63, 215.93, 215.93, 116.21, 116.21, 12.49, 0,      0,      13.33, 11, 8, 0,      0,      'S'],
+  /* B4  */ ['S', 338.82, 3, 3, 3, 3, 338.82, 338.82, 207.78, 207.78, 70.69,  70.69,  60.35, 0,      0,      15.81,  8, 8, 0,      0,      'S'],
+  /* B5  */ ['S', 393.77, 3, 3, 3, 3, 393.77, 393.77, 254.41, 254.41, 121.34, 121.34, 18.03, 0,      0,      16.80, 10, 8, 0,      0,      'S'],
+  /* B6  */ ['S', 382.24, 3, 3, 3, 3, 382.24, 382.24, 249.13, 249.13, 111.80, 111.80, 21.31, 0,      0,      16.89, 12, 8, 0,      0,      'S'],
+  /* B7  */ ['S', 418.22, 3, 3, 3, 3, 418.22, 418.22, 258.76, 258.76, 113.43, 113.43, 46.03, 0,      0,      14.23,  9, 8, 0,      0,      'S'],
+  /* B8  */ ['S', 311.26, 3, 3, 3, 3, 311.26, 311.26, 224.14, 224.14, 56.42,  56.42,  30.70, 14.60,  14.60,  9.21,   9, 8, 0,      0,      'S'],
+  /* B9  */ ['S', 366.43, 3, 3, 3, 3, 366.43, 366.43, 247.78, 247.78, 84.43,  84.43,  34.22, 0,      0,      10.85,  6, 8, 247.37, 247.37, 'S'],
+  /* B10 */ ['S', 0,      0, 0, 0, 0, 0,      0,      0,      0,      0,      0,      0,     0,      0,      0,       0, 0, 247.37, 247.37, 'S'],
 ];
 
 // Estado das medicoes: [blocoIdx][etapaIdx] = {total, exec, statusSimples}
@@ -685,7 +668,7 @@ function getTLV(){
     return {s:s, d:datFmt, h:hdr, p:txt};
   });
   // Adiciona marco de conclusão geral ao final
-  itens.push({s:'fut', d:'19/08/2027', h:'Previsão de conclusão geral', p:'Entrega final com todos os blocos concluídos. Data prevista: 19/08/2027.'});
+  itens.push({s:'fut', d:'19/08/2027', h:'Previsão de conclusão geral', p:'Entrega final com todos os blocos concluídos. Data prevista: 10/09/2027.'});
   return itens;
 }
 
@@ -744,7 +727,7 @@ function diasTrab(){
 }
 
 function diasUteisRestantes(){
-  const fim = new Date('2027-08-19');
+  const fim = new Date('2027-09-10');
   const hj  = new Date();
   hj.setHours(0,0,0,0);
   fim.setHours(0,0,0,0);
@@ -784,15 +767,15 @@ function rDash(){
   document.getElementById('d-gpc').innerHTML=`<div class="gpc">
     <div class="gpc-ring"><svg width="88" height="88" viewBox="0 0 90 90"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#f0ece6" stroke-width="7"/><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#5C2444" stroke-width="7" stroke-dasharray="${da} ${ci.toFixed(1)}" stroke-linecap="round"/></svg><div class="gpc-n"><span>${gp}%</span><small>GLOBAL</small></div></div>
     <div class="gpc-rows">
-      <div class="gr"><span class="gr-l">CONCLUÍDOS</span><div class="gr-t"><div class="gr-f f-ok" style="width:${Math.round(done/9*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${done}/9</span></div>
-      <div class="gr"><span class="gr-l">EM ANDAMENTO</span><div class="gr-t"><div class="gr-f f-wip" style="width:${Math.round(wip/9*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${wip}/9</span></div>
-      <div class="gr"><span class="gr-l">PENDENTES</span><div class="gr-t"><div class="gr-f f-G" style="width:${Math.round(pend/9*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${pend}/9</span></div>
+      <div class="gr"><span class="gr-l">CONCLUÍDOS</span><div class="gr-t"><div class="gr-f f-ok" style="width:${Math.round(done/10*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${done}/9</span></div>
+      <div class="gr"><span class="gr-l">EM ANDAMENTO</span><div class="gr-t"><div class="gr-f f-wip" style="width:${Math.round(wip/10*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${wip}/9</span></div>
+      <div class="gr"><span class="gr-l">PENDENTES</span><div class="gr-t"><div class="gr-f f-G" style="width:${Math.round(pend/10*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${pend}/9</span></div>
     </div>
   </div>`;
 
   document.getElementById('d-kpi').innerHTML=`
     <div class="kpi m"><div class="kpi-l">Total executado</div><div class="kpi-v" style="color:var(--M)">${gp}%</div><div class="kpi-h">da obra completa</div></div>
-    <div class="kpi ok"><div class="kpi-l">Concluídos</div><div class="kpi-v" style="color:var(--ok)">${done}</div><div class="kpi-h">de 9 blocos</div></div>
+    <div class="kpi ok"><div class="kpi-l">Concluídos</div><div class="kpi-v" style="color:var(--ok)">${done}</div><div class="kpi-h">de 10 blocos</div></div>
     <div class="kpi g"><div class="kpi-l">Em andamento</div><div class="kpi-v" style="color:var(--G)">${wip}</div><div class="kpi-h">blocos ativos</div></div>
     <div class="kpi"><div class="kpi-l">Pendentes</div><div class="kpi-v">${pend}</div><div class="kpi-h">não iniciados</div></div>`;
 
@@ -807,31 +790,11 @@ function rDash(){
         <span class="pill ${pillCls(b.st)}">${SL[b.st]}</span>
       </div>
     </div>`;
-  }).join('')+rGlobalT();
+  }).join('');
 }
 
 // Card da etapa global T no Dashboard e Etapas
-function rGlobalT(){
-  var tot=MED_GLOBAL_T.total||0;
-  var exec=Math.min(Math.max(0,MED_GLOBAL_T.exec||0),tot);
-  var pct=tot>0?Math.round((exec/tot)*100):0;
-  var col=pct===100?'var(--ok)':pct>0?'var(--wip)':'var(--G)';
-  var stTxt=pct===100?'CONCLUíDO':pct>0?'EM ANDAMENTO':'APÓS TODOS OS BLOCOS';
-  var stPill=pct===100?'p-ok':pct>0?'p-wip':'p-wait';
-  var execFmt=exec.toFixed(2), totFmt=tot>0?tot.toFixed(2):'—';
-  var h='<div style="background:#fff;border:1px dashed var(--G);border-radius:10px;padding:13px 16px;margin-top:4px;">';
-  h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">';
-  h+='<span style="font-size:10px;font-weight:700;color:var(--G);background:var(--GP);border-radius:4px;padding:2px 8px;letter-spacing:.3px;">T — ETAPA GLOBAL</span>';
-  h+='<span style="font-size:13px;font-weight:600;flex:1;">'+ETAPA_GLOBAL_T.n+'</span>';
-  h+='<span class="pill '+stPill+'" style="font-size:9px;">'+stTxt+'</span></div>';
-  h+='<div style="height:5px;background:var(--GB);border-radius:3px;overflow:hidden;margin-bottom:6px;">';
-  h+='<div style="height:100%;border-radius:3px;background:'+col+';width:'+pct+'%;transition:width .8s;"></div></div>';
-  h+='<div style="display:flex;gap:14px;font-size:11px;color:var(--mt);">';
-  h+='<span>Executado: <strong style="color:var(--tx);">'+execFmt+' m²</strong></span>';
-  h+='<span>Total previsto: <strong style="color:var(--tx);">'+totFmt+(tot>0?' m²':'')+'</strong></span>';
-  h+='<span style="color:'+col+';font-weight:700;">'+pct+'%</span></div></div>';
-  return h;
-}
+
 
 // ============================================================
 //  RENDER BLOCOS COM ETAPAS TÉCNICAS
@@ -973,10 +936,7 @@ function chkPwd(){
     populateSels();
     rAdminComs();
     rCal(); // atualiza calendário com permissões de admin
-    // Popular inputs da etapa global T
-    const ti=document.getElementById('med-t-exec'), tt=document.getElementById('med-t-tot');
-    if(ti) ti.value=MED_GLOBAL_T.exec||0;
-    if(tt) tt.value=MED_GLOBAL_T.total||0;
+
   } else {
     document.getElementById('pwd-err').textContent='Senha incorreta. Tente novamente.';
   }
@@ -997,7 +957,6 @@ function salvarFirebase(){
   const dados = {
     BLOCOS_ST: BLOCOS.map(b=>({pct:b.pct||0, st:b.st})),
     MED: MED,
-    MED_GLOBAL_T: MED_GLOBAL_T,
     CAL_MANUAL: CAL_MANUAL,
     COMS: COMS,
   };
@@ -1082,18 +1041,7 @@ function saveMed(){
   setTimeout(()=>{m.textContent='';},4000);
 }
 
-function saveMedT(){
-  const exec = document.getElementById('med-t-exec');
-  const tot  = document.getElementById('med-t-tot');
-  if(exec) MED_GLOBAL_T.exec  = Math.max(0, parseFloat(exec.value)||0);
-  if(tot)  MED_GLOBAL_T.total = Math.max(0, parseFloat(tot.value)||0);
-  rDash();
-  salvarFirebase();
-  const m=document.getElementById('sv-t-msg');
-  m.textContent='✓ ETAPA T ATUALIZADA — '+new Date().toLocaleTimeString('pt-BR');
-  m.style.color='var(--ok)';
-  setTimeout(()=>{m.textContent='';},4000);
-}
+
 
 // ============================================================
 //  ADMIN — COMUNICADOS
@@ -1217,7 +1165,6 @@ window.chkPwd     = chkPwd;
 window.logout     = logout;
 window.saveStatus = saveStatus;
 window.saveMed    = saveMed;
-window.saveMedT   = saveMedT;
 window.addC       = addC;
 window.delCom     = delCom;
 window.oWA        = oWA;
@@ -1264,17 +1211,19 @@ function rCalIndicadores(){
       const dw=c.getDay(), ds=c.toISOString().slice(0,10);
       if(dw>0&&dw<6&&!FERIADOS_SET.has(ds)) cont++;
     }
-    projecao = c.toLocaleDateString('pt-BR');
+    // A projeção NUNCA pode ultrapassar a data contratual (fim do último bloco).
+    // Se ultrapassar, exibe a data contratual com indicador de risco.
+    const dataContratual = fimContratual(BLOCOS.length-1);
+    if(c > dataContratual){
+      projecao = dataContratual.toLocaleDateString('pt-BR');
+    } else {
+      projecao = c.toLocaleDateString('pt-BR');
+    }
   }
 
-  // Status considera: dias não trabalhados atrasam a obra
-  const temAtraso = totalNao > 0 || atrasoBlocos > 0;
-  const statusCor = temAtraso ? 'var(--err)' : totalTrab > 0 ? 'var(--ok)' : 'var(--mt)';
-  const statusTxt = atrasoBlocos > 0
-    ? atrasoBlocos+' BLOCO(S) COM DIAS EXCEDIDOS'
-    : totalNao > 0
-      ? totalNao+' DIA(S) NÃO TRABALHADO(S)'
-      : totalTrab > 0 ? 'NO PRAZO' : 'OBRA NÃO INICIADA';
+  // Status público — exibe apenas NO PRAZO ou EM ANDAMENTO, sem alarmes
+  const statusCor = totalTrab > 0 ? 'var(--ok)' : 'var(--mt)';
+  const statusTxt = totalTrab > 0 ? 'NO PRAZO' : 'OBRA NÃO INICIADA';
 
   let html = `<div style="background:#fff;border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:4px;">
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mt);margin-bottom:12px;">CONTROLE GLOBAL DA OBRA</div>
@@ -1292,9 +1241,9 @@ function rCalIndicadores(){
       <div style="text-align:center;padding:10px;background:var(--GP);border:1px solid var(--GB);border-radius:8px;">
         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--G);">Projeção conclusão</div>
         <div style="font-size:16px;font-weight:700;color:var(--G);margin-top:4px;">${projecao}</div>
-        <div style="font-size:11px;color:var(--G);">Contratual: 19/08/2027</div>
+        <div style="font-size:11px;color:var(--G);">Contratual: 10/09/2027</div>
       </div>
-      <div style="text-align:center;padding:10px;background:${atrasoBlocos>0?'var(--err-bg)':'var(--pend-bg)'};border:1px solid ${atrasoBlocos>0?'var(--err-b)':'var(--pend-b)'};border-radius:8px;">
+      <div style="text-align:center;padding:10px;background:var(--pend-bg);border:1px solid var(--pend-b);border-radius:8px;">
         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:${statusCor};">Status</div>
         <div style="font-size:12px;font-weight:700;color:${statusCor};margin-top:6px;">${statusTxt}</div>
       </div>
@@ -1462,10 +1411,6 @@ window.addEventListener('load', ()=>{
   if(window._fbCarregar){
     window._fbCarregar(dados => {
       if(dados.BLOCOS_ST) dados.BLOCOS_ST.forEach((s,i)=>{ if(BLOCOS[i] && s){ BLOCOS[i].pct=s.pct||0; if(ST_OPTS.includes(s.st)) BLOCOS[i].st=s.st; } });
-      if(dados.MED_GLOBAL_T && typeof dados.MED_GLOBAL_T.exec==='number'){
-        if(dados.MED_GLOBAL_T.total>0) MED_GLOBAL_T.total=dados.MED_GLOBAL_T.total;
-        MED_GLOBAL_T.exec=dados.MED_GLOBAL_T.exec;
-      }
       if(dados.MED) dados.MED.forEach(function(bloco,bi){
         if(!bloco || !MED[bi]) return;
         bloco.forEach(function(et,ei){
