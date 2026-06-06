@@ -462,6 +462,26 @@ body{font-family:var(--fn);background:var(--bg);color:var(--tx);font-size:14px;}
       </div>
     </div>
 
+    <!-- 2b. ETAPA GLOBAL T — PISO -->
+    <div class="as">
+      <div class="as-title"><i class="ti ti-paint"></i>Etapa global — Pintura do piso (T)</div>
+      <div class="as-sub">Executada após a conclusão de todos os blocos. Informe o total levantado e o executado.</div>
+      <div style="background:var(--bg);border-radius:10px;padding:14px;">
+        <div class="med-row">
+          <span style="font-size:10px;font-weight:700;color:var(--G);background:var(--GP);border-radius:4px;padding:2px 6px;flex-shrink:0;min-width:26px;text-align:center;">T</span>
+          <span class="med-nome">Pintura do piso do caminho de circulação (carrinho)</span>
+          <span class="med-unit">m²</span>
+          <span style="font-size:10px;color:var(--ok);font-weight:700;white-space:nowrap;">EXEC.</span>
+          <input class="med-inp" type="number" min="0" step="0.01" id="med-t-exec" value="0" style="border-color:var(--ok-b);">
+          <span class="med-sep">de</span>
+          <span style="font-size:10px;color:var(--G);font-weight:700;white-space:nowrap;">TOTAL</span>
+          <input class="med-inp" type="number" min="0" step="0.01" id="med-t-tot" value="0" style="border-color:var(--GB);">
+        </div>
+      </div>
+      <button class="btn-sv" onclick="saveMedT()" style="margin-top:12px;"><i class="ti ti-device-floppy"></i> SALVAR ETAPA T</button>
+      <p class="sv-msg" id="sv-t-msg"></p>
+    </div>
+
     <!-- 3. COMUNICADOS -->
     <div class="as">
       <div class="as-title"><i class="ti ti-notebook"></i>Publicar registro no Diário de Obra</div>
@@ -577,14 +597,18 @@ const ETAPAS = [
   {id:11, cod:'K', n:'Pintura de paredes — 1ª demão',                                            tipo:'m2'},
   {id:12, cod:'L', n:'Pintura de paredes — 2ª demão',                                            tipo:'m2'},
   {id:13, cod:'M', n:'Pintura dos pilares e colunas',                                             tipo:'m2'},
-  {id:14, cod:'N', n:'Pintura das portas',                                                        tipo:'m2'},
-  {id:15, cod:'O', n:'Recomposição das paredes em cima das portas dos transformadores',           tipo:'m2'},
+  {id:14, cod:'N', n:'Pintura das portas',                                                        tipo:'m2',     blocos:[1,7]}, // índices 1=B2, 7=B8
+  {id:15, cod:'O', n:'Recomposição das paredes em cima das portas dos transformadores',           tipo:'m2',     blocos:[1,7]}, // índices 1=B2, 7=B8
   {id:16, cod:'P', n:'Pintura de delimitação das vagas',                                          tipo:'m2'},
   {id:17, cod:'R', n:'Pintura da numeração das vagas',                                            tipo:'un'},
   {id:18, cod:'S', n:'Instalação de pontos de iluminação',                                        tipo:'un'},
-  {id:19, cod:'T', n:'Pintura do piso do caminho de circulação (carrinho)',                       tipo:'m2'},
-  {id:20, cod:'Q', n:'Limpeza do local — fechamento do bloco',                                    tipo:'status'},
+  {id:19, cod:'Q', n:'Limpeza do local — fechamento do bloco',                                    tipo:'status'},
 ];
+
+// Etapa global — executada uma única vez após conclusão de todos os blocos
+const ETAPA_GLOBAL_T = {id:20, cod:'T', n:'Pintura do piso do caminho de circulação (carrinho)', tipo:'m2'};
+// Estado da etapa global T: {total, exec}
+const MED_GLOBAL_T = {total:0, exec:0};
 
 const UNIDADE_LABEL = {m2:'m²', un:'un', status:'—'};
 
@@ -609,17 +633,17 @@ const BLOCOS = [
 //  Inteiro = unidade (un) | Decimal = m²  |  'S' = etapa de status (sem medição numérica)
 // ============================================================
 const LEV_INICIAL = [
-  //         A    B       C  D  E  F  G       H       I       J       K       L       M      N      O      P      R   S  T    Q
-  //                                                                                    (só B2/B8)    vagas  ilum  piso fech.
-  /* B1 */ ['S', 394.77, 3, 3, 3, 3, 394.77, 394.77, 303.07, 303.07, 24.10,  24.10,  67.61, 0,     0,     20.79, 11, 8, 0, 'S'],
-  /* B2 */ ['S', 602.90, 3, 3, 3, 3, 602.90, 602.90, 338.02, 338.02, 192.51, 192.51, 72.37, 13.06, 13.06, 17.90, 11, 8, 0, 'S'],
-  /* B3 */ ['S', 344.63, 3, 3, 3, 3, 344.63, 344.63, 215.93, 215.93, 116.21, 116.21, 12.49, 0,     0,     13.33, 11, 8, 0, 'S'],
-  /* B4 */ ['S', 338.82, 3, 3, 3, 3, 338.82, 338.82, 207.78, 207.78, 70.69,  70.69,  60.35, 0,     0,     15.81,  8, 8, 0, 'S'],
-  /* B5 */ ['S', 393.77, 3, 3, 3, 3, 393.77, 393.77, 254.41, 254.41, 121.34, 121.34, 18.03, 0,     0,     16.80, 10, 8, 0, 'S'],
-  /* B6 */ ['S', 382.24, 3, 3, 3, 3, 382.24, 382.24, 249.13, 249.13, 111.80, 111.80, 21.31, 0,     0,     16.89, 12, 8, 0, 'S'],
-  /* B7 */ ['S', 418.22, 3, 3, 3, 3, 418.22, 418.22, 258.76, 258.76, 113.43, 113.43, 46.03, 0,     0,     14.23,  9, 8, 0, 'S'],
-  /* B8 */ ['S', 311.26, 3, 3, 3, 3, 311.26, 311.26, 224.14, 224.14, 56.42,  56.42,  30.70, 14.60, 14.60, 9.21,   9, 8, 0, 'S'],
-  /* B9 */ ['S', 366.43, 3, 3, 3, 3, 366.43, 366.43, 247.78, 247.78, 84.43,  84.43,  34.22, 0,     0,     10.85,  6, 8, 0, 'S'],
+  //         A    B       C  D  E  F  G       H       I       J       K       L       M      N       O       P      R   S   Q
+  //                                                                                   (só B2/B8)           vagas  ilum fech.
+  /* B1 */ ['S', 394.77, 3, 3, 3, 3, 394.77, 394.77, 303.07, 303.07, 24.10,  24.10,  67.61, 0,      0,      20.79, 11, 8, 'S'],
+  /* B2 */ ['S', 602.90, 3, 3, 3, 3, 602.90, 602.90, 338.02, 338.02, 192.51, 192.51, 72.37, 13.06,  13.06,  17.90, 11, 8, 'S'],
+  /* B3 */ ['S', 344.63, 3, 3, 3, 3, 344.63, 344.63, 215.93, 215.93, 116.21, 116.21, 12.49, 0,      0,      13.33, 11, 8, 'S'],
+  /* B4 */ ['S', 338.82, 3, 3, 3, 3, 338.82, 338.82, 207.78, 207.78, 70.69,  70.69,  60.35, 0,      0,      15.81,  8, 8, 'S'],
+  /* B5 */ ['S', 393.77, 3, 3, 3, 3, 393.77, 393.77, 254.41, 254.41, 121.34, 121.34, 18.03, 0,      0,      16.80, 10, 8, 'S'],
+  /* B6 */ ['S', 382.24, 3, 3, 3, 3, 382.24, 382.24, 249.13, 249.13, 111.80, 111.80, 21.31, 0,      0,      16.89, 12, 8, 'S'],
+  /* B7 */ ['S', 418.22, 3, 3, 3, 3, 418.22, 418.22, 258.76, 258.76, 113.43, 113.43, 46.03, 0,      0,      14.23,  9, 8, 'S'],
+  /* B8 */ ['S', 311.26, 3, 3, 3, 3, 311.26, 311.26, 224.14, 224.14, 56.42,  56.42,  30.70, 14.60,  14.60,  9.21,   9, 8, 'S'],
+  /* B9 */ ['S', 366.43, 3, 3, 3, 3, 366.43, 366.43, 247.78, 247.78, 84.43,  84.43,  34.22, 0,      0,      10.85,  6, 8, 'S'],
 ];
 
 // Estado das medicoes: [blocoIdx][etapaIdx] = {total, exec, statusSimples}
@@ -668,18 +692,28 @@ function getTLV(){
 // ============================================================
 //  CÁLCULO DE PERCENTUAL POR BLOCO (baseado em medições)
 // ============================================================
+function etapasDoBloco(bi){
+  // Retorna apenas as etapas mensuráveis que se aplicam a este bloco.
+  // Etapas com campo 'blocos' só aparecem nos índices listados.
+  return ETAPAS.filter(e => {
+    if(e.tipo === 'status') return false;
+    if(e.blocos && !e.blocos.includes(bi)) return false;
+    return true;
+  });
+}
+
 function calcPct(bi){
   const meds = MED[bi];
-  const etapasComMed = ETAPAS.filter(e => e.tipo !== 'status');
-  const total = etapasComMed.reduce((s,e) => {
+  const etapas = etapasDoBloco(bi);
+  const total = etapas.reduce((s,e) => {
     const idx = ETAPAS.indexOf(e);
     return s + (meds[idx].total || 0);
   }, 0);
   if(total === 0) return 0;
-  const exec = etapasComMed.reduce((s,e) => {
+  const exec = etapas.reduce((s,e) => {
     const idx = ETAPAS.indexOf(e);
-    const ex = Math.max(0, meds[idx].exec || 0); // nunca negativo
-    return s + Math.min(ex, meds[idx].total || 0); // nunca > total
+    const ex = Math.max(0, meds[idx].exec || 0);
+    return s + Math.min(ex, meds[idx].total || 0);
   }, 0);
   return Math.round((exec / total) * 100);
 }
@@ -773,7 +807,30 @@ function rDash(){
         <span class="pill ${pillCls(b.st)}">${SL[b.st]}</span>
       </div>
     </div>`;
-  }).join('');
+  }).join('')+rGlobalT();
+}
+
+// Card da etapa global T no Dashboard e Etapas
+function rGlobalT(){
+  var tot=MED_GLOBAL_T.total||0;
+  var exec=Math.min(Math.max(0,MED_GLOBAL_T.exec||0),tot);
+  var pct=tot>0?Math.round((exec/tot)*100):0;
+  var col=pct===100?'var(--ok)':pct>0?'var(--wip)':'var(--G)';
+  var stTxt=pct===100?'CONCLUíDO':pct>0?'EM ANDAMENTO':'APÓS TODOS OS BLOCOS';
+  var stPill=pct===100?'p-ok':pct>0?'p-wip':'p-wait';
+  var execFmt=exec.toFixed(2), totFmt=tot>0?tot.toFixed(2):'—';
+  var h='<div style="background:#fff;border:1px dashed var(--G);border-radius:10px;padding:13px 16px;margin-top:4px;">';
+  h+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">';
+  h+='<span style="font-size:10px;font-weight:700;color:var(--G);background:var(--GP);border-radius:4px;padding:2px 8px;letter-spacing:.3px;">T — ETAPA GLOBAL</span>';
+  h+='<span style="font-size:13px;font-weight:600;flex:1;">'+ETAPA_GLOBAL_T.n+'</span>';
+  h+='<span class="pill '+stPill+'" style="font-size:9px;">'+stTxt+'</span></div>';
+  h+='<div style="height:5px;background:var(--GB);border-radius:3px;overflow:hidden;margin-bottom:6px;">';
+  h+='<div style="height:100%;border-radius:3px;background:'+col+';width:'+pct+'%;transition:width .8s;"></div></div>';
+  h+='<div style="display:flex;gap:14px;font-size:11px;color:var(--mt);">';
+  h+='<span>Executado: <strong style="color:var(--tx);">'+execFmt+' m²</strong></span>';
+  h+='<span>Total previsto: <strong style="color:var(--tx);">'+totFmt+(tot>0?' m²':'')+'</strong></span>';
+  h+='<span style="color:'+col+';font-weight:700;">'+pct+'%</span></div></div>';
+  return h;
 }
 
 // ============================================================
@@ -783,6 +840,8 @@ function rBlocos(){
   document.getElementById('bl-list').innerHTML=BLOCOS.map((b,i)=>{
     const p = calcPct(i), f = fc(b.st);
     const etHtml = ETAPAS.map((e,ei) => {
+      // Ocultar etapas que não se aplicam a este bloco
+      if(e.blocos && !e.blocos.includes(i)) return '';
       const m = MED[i][ei];
       if(e.tipo === 'status'){
         const st = m.statusSimples || 'pendente';
@@ -914,6 +973,10 @@ function chkPwd(){
     populateSels();
     rAdminComs();
     rCal(); // atualiza calendário com permissões de admin
+    // Popular inputs da etapa global T
+    const ti=document.getElementById('med-t-exec'), tt=document.getElementById('med-t-tot');
+    if(ti) ti.value=MED_GLOBAL_T.exec||0;
+    if(tt) tt.value=MED_GLOBAL_T.total||0;
   } else {
     document.getElementById('pwd-err').textContent='Senha incorreta. Tente novamente.';
   }
@@ -934,6 +997,7 @@ function salvarFirebase(){
   const dados = {
     BLOCOS_ST: BLOCOS.map(b=>({pct:b.pct||0, st:b.st})),
     MED: MED,
+    MED_GLOBAL_T: MED_GLOBAL_T,
     CAL_MANUAL: CAL_MANUAL,
     COMS: COMS,
   };
@@ -969,6 +1033,8 @@ function rMed(){
   html+='<strong style="color:var(--M);">EXECUTADO</strong> = quantidade já realizada &nbsp;|&nbsp; ';
   html+='<strong style="color:var(--G);">TOTAL</strong> = levantamento do bloco (editável conforme medição em campo)</div>';
   ETAPAS.forEach(function(e,ei){
+    // Pular etapas que não se aplicam a este bloco
+    if(e.blocos && !e.blocos.includes(bi)) return;
     var m=MED[bi][ei];
     var unit=UNIDADE_LABEL[e.tipo];
     var isDecimal=(e.tipo==='m2');
@@ -1012,6 +1078,19 @@ function saveMed(){
   salvarFirebase();
   const m=document.getElementById('sv-med-msg');
   m.textContent='✓ MEDIÇÕES DO BLOCO '+(bi+1)+' ATUALIZADAS — '+new Date().toLocaleTimeString('pt-BR');
+  m.style.color='var(--ok)';
+  setTimeout(()=>{m.textContent='';},4000);
+}
+
+function saveMedT(){
+  const exec = document.getElementById('med-t-exec');
+  const tot  = document.getElementById('med-t-tot');
+  if(exec) MED_GLOBAL_T.exec  = Math.max(0, parseFloat(exec.value)||0);
+  if(tot)  MED_GLOBAL_T.total = Math.max(0, parseFloat(tot.value)||0);
+  rDash();
+  salvarFirebase();
+  const m=document.getElementById('sv-t-msg');
+  m.textContent='✓ ETAPA T ATUALIZADA — '+new Date().toLocaleTimeString('pt-BR');
   m.style.color='var(--ok)';
   setTimeout(()=>{m.textContent='';},4000);
 }
@@ -1138,6 +1217,7 @@ window.chkPwd     = chkPwd;
 window.logout     = logout;
 window.saveStatus = saveStatus;
 window.saveMed    = saveMed;
+window.saveMedT   = saveMedT;
 window.addC       = addC;
 window.delCom     = delCom;
 window.oWA        = oWA;
@@ -1382,6 +1462,10 @@ window.addEventListener('load', ()=>{
   if(window._fbCarregar){
     window._fbCarregar(dados => {
       if(dados.BLOCOS_ST) dados.BLOCOS_ST.forEach((s,i)=>{ if(BLOCOS[i] && s){ BLOCOS[i].pct=s.pct||0; if(ST_OPTS.includes(s.st)) BLOCOS[i].st=s.st; } });
+      if(dados.MED_GLOBAL_T && typeof dados.MED_GLOBAL_T.exec==='number'){
+        if(dados.MED_GLOBAL_T.total>0) MED_GLOBAL_T.total=dados.MED_GLOBAL_T.total;
+        MED_GLOBAL_T.exec=dados.MED_GLOBAL_T.exec;
+      }
       if(dados.MED) dados.MED.forEach(function(bloco,bi){
         if(!bloco || !MED[bi]) return;
         bloco.forEach(function(et,ei){
