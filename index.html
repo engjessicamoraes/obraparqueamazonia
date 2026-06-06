@@ -657,14 +657,15 @@ const TLV = [
 function calcPct(bi){
   const meds = MED[bi];
   const etapasComMed = ETAPAS.filter(e => e.tipo !== 'status');
-  const total = etapasComMed.reduce((s,e,i) => {
+  const total = etapasComMed.reduce((s,e) => {
     const idx = ETAPAS.indexOf(e);
     return s + (meds[idx].total || 0);
   }, 0);
   if(total === 0) return 0;
   const exec = etapasComMed.reduce((s,e) => {
     const idx = ETAPAS.indexOf(e);
-    return s + Math.min(meds[idx].exec || 0, meds[idx].total || 0);
+    const ex = Math.max(0, meds[idx].exec || 0); // nunca negativo
+    return s + Math.min(ex, meds[idx].total || 0); // nunca > total
   }, 0);
   return Math.round((exec / total) * 100);
 }
@@ -720,6 +721,7 @@ function diasUteisRestantes(){
 
 function fc(st){ return FILL_CLS[st]||''; }
 function pillCls(st){ return SPILL[st]||'p-pend'; }
+function escHTML(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 // ============================================================
 //  RENDER DASHBOARD
@@ -856,8 +858,8 @@ function rCom(){
         <span class="cc-dt"><i class="ti ti-calendar" style="font-size:11px;vertical-align:-1px;"></i> ${c.d}</span>
         <span class="cc-tag" style="background:${c.t==='warn'?'var(--wip-bg)':c.t==='ok'?'var(--ok-bg)':'var(--MP)'};color:${c.t==='warn'?'var(--wip)':c.t==='ok'?'var(--ok)':'var(--M)'};">${c.t==='warn'?'ATENÇÃO':c.t==='ok'?'CONCLUSÃO':'INFORMATIVO'}</span>
       </div>
-      <div class="cc-h">${c.h}</div>
-      <div class="cc-p">${c.p}</div>
+      <div class="cc-h">${escHTML(c.h)}</div>
+      <div class="cc-p">${escHTML(c.p)}</div>
       ${c.link?`<a href="${c.link}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:var(--MP);border:1px solid var(--MB);border-radius:7px;font-size:12px;font-weight:600;color:var(--M);text-decoration:none;"><i class="ti ti-photo" style="font-size:14px;"></i> VER FOTOS DA VISTORIA</a>`:''}
     </div>`).join('');
   rAdminComs();
@@ -871,7 +873,7 @@ function rAdminComs(){
     <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd);flex-wrap:wrap;">
       <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:${c.t==='warn'?'var(--wip-bg)':c.t==='ok'?'var(--ok-bg)':'var(--MP)'};color:${c.t==='warn'?'var(--wip)':c.t==='ok'?'var(--ok)':'var(--M)'};">${c.t==='warn'?'ATENÇÃO':c.t==='ok'?'CONCLUSÃO':'INFO'}</span>
       <span style="font-size:12px;color:var(--mt);">${c.d}</span>
-      <span style="flex:1;font-size:13px;font-weight:500;">${c.h}</span>
+      <span style="flex:1;font-size:13px;font-weight:500;">${escHTML(c.h)}</span>
       ${c.link?`<i class="ti ti-link" style="font-size:13px;color:var(--G);" title="Tem link de fotos"></i>`:''}
       <button onclick="delCom(${i})" style="background:none;border:1px solid var(--err-b);color:var(--err);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;font-family:var(--fn);display:flex;align-items:center;gap:4px;"><i class="ti ti-trash" style="font-size:12px;"></i> APAGAR</button>
     </div>`).join('');
@@ -1321,8 +1323,19 @@ rDash(); rBlocos(); rCrono(); rTL(); rCom(); rCal(); initQR();
 window.addEventListener('load', ()=>{
   if(window._fbCarregar){
     window._fbCarregar(dados => {
-      if(dados.BLOCOS_ST) dados.BLOCOS_ST.forEach((s,i)=>{ if(BLOCOS[i]){ BLOCOS[i].pct=s.pct||0; BLOCOS[i].st=s.st||BLOCOS[i].st; } });
-      if(dados.MED) dados.MED.forEach((bloco,bi)=>{ if(bloco) bloco.forEach((et,ei)=>{ if(MED[bi]&&MED[bi][ei]&&et) Object.assign(MED[bi][ei],et); }); });
+      if(dados.BLOCOS_ST) dados.BLOCOS_ST.forEach((s,i)=>{ if(BLOCOS[i] && s){ BLOCOS[i].pct=s.pct||0; if(ST_OPTS.includes(s.st)) BLOCOS[i].st=s.st; } });
+      if(dados.MED) dados.MED.forEach(function(bloco,bi){
+        if(!bloco || !MED[bi]) return;
+        bloco.forEach(function(et,ei){
+          if(!MED[bi][ei] || !et) return;
+          // Carrega apenas exec e statusSimples do Firebase.
+          // O total NUNCA é sobrescrito com zero — mantém o levantamento inicial do código,
+          // a menos que o Firebase tenha um valor maior que zero (edição manual da engenheira).
+          if(typeof et.exec === 'number')             MED[bi][ei].exec = et.exec;
+          if(typeof et.statusSimples === 'string')    MED[bi][ei].statusSimples = et.statusSimples;
+          if(typeof et.total === 'number' && et.total > 0) MED[bi][ei].total = et.total;
+        });
+      });
       if(dados.CAL_MANUAL) Object.assign(CAL_MANUAL, dados.CAL_MANUAL);
       if(dados.COMS && dados.COMS.length){ COMS.length=0; dados.COMS.forEach(c=>COMS.push(c)); }
       rDash(); rBlocos(); rCrono(); rCom(); rCal();
