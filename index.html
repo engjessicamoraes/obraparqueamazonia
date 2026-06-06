@@ -580,8 +580,10 @@ const ETAPAS = [
   {id:14, cod:'N', n:'Pintura das portas',                                                        tipo:'m2'},
   {id:15, cod:'O', n:'Recomposição das paredes em cima das portas dos transformadores',           tipo:'m2'},
   {id:16, cod:'P', n:'Pintura de delimitação das vagas',                                          tipo:'m2'},
-  {id:17, cod:'Q', n:'Limpeza do local',                                                          tipo:'status'},
-  {id:18, cod:'R', n:'Pintura da numeração das vagas',                                                 tipo:'un'},
+  {id:17, cod:'R', n:'Pintura da numeração das vagas',                                            tipo:'un'},
+  {id:18, cod:'S', n:'Instalação de pontos de iluminação',                                        tipo:'un'},
+  {id:19, cod:'T', n:'Pintura do piso do caminho de circulação (carrinho)',                       tipo:'m2'},
+  {id:20, cod:'Q', n:'Limpeza do local — fechamento do bloco',                                    tipo:'status'},
 ];
 
 const UNIDADE_LABEL = {m2:'m²', un:'un', status:'—'};
@@ -591,7 +593,7 @@ const UNIDADE_LABEL = {m2:'m²', un:'un', status:'—'};
 // ============================================================
 const BLOCOS = [
   {id:1, n:'BLOCO 1', v:'Box 68 ao Box 73',                                            d:25, ini:'2026-05-12', fim:'16/06/2026', st:'andamento'},
-  {id:2, n:'BLOCO 2', v:'Box 74 ao Box 03 · Transformador · Almoxarifado Gilmar',      d:35, ini:'2026-06-17', fim:'04/08/2026', st:'pendente'},
+  {id:2, n:'BLOCO 2', v:'Box 74 ao Box 03 · Transformador · Almoxarifado Gilmar',      d:35, ini:'2026-06-02', fim:'21/07/2026', st:'andamento'},
   {id:3, n:'BLOCO 3', v:'Box 04 ao Box 13',                                           d:25, ini:'2026-08-05', fim:'09/09/2026', st:'pendente'},
   {id:4, n:'BLOCO 4', v:'Box 14 ao Box 22',                                           d:35, ini:'2026-09-10', fim:'29/10/2026', st:'pendente'},
   {id:5, n:'BLOCO 5', v:'Box 23 ao Box 32',                                           d:40, ini:'2026-10-30', fim:'29/12/2026', st:'pendente'},
@@ -607,16 +609,17 @@ const BLOCOS = [
 //  Inteiro = unidade (un) | Decimal = m²  |  'S' = etapa de status (sem medição numérica)
 // ============================================================
 const LEV_INICIAL = [
-  //         A    B       C  D  E  F  G       H       I       J       K       L       M      N      O      P      Q   R
-  /* B1 */ ['S', 394.77, 3, 3, 3, 3, 394.77, 394.77, 303.07, 303.07, 24.10,  24.10,  67.61, 0,     0,     20.79, 'S', 11],
-  /* B2 */ ['S', 602.90, 3, 3, 3, 3, 602.90, 602.90, 338.02, 338.02, 192.51, 192.51, 72.37, 13.06, 13.06, 17.90, 'S', 11],
-  /* B3 */ ['S', 344.63, 3, 3, 3, 3, 344.63, 344.63, 215.93, 215.93, 116.21, 116.21, 12.49, 0.90,  0.90,  13.33, 'S', 11],
-  /* B4 */ ['S', 338.82, 3, 3, 3, 3, 338.82, 338.82, 207.78, 207.78, 70.69,  70.69,  60.35, 0,     0,     15.81, 'S',  8],
-  /* B5 */ ['S', 393.77, 3, 3, 3, 3, 393.77, 393.77, 254.41, 254.41, 121.34, 121.34, 18.03, 0,     0,     16.80, 'S', 10],
-  /* B6 */ ['S', 382.24, 3, 3, 3, 3, 382.24, 382.24, 249.13, 249.13, 111.80, 111.80, 21.31, 0,     0,     16.89, 'S', 12],
-  /* B7 */ ['S', 418.22, 3, 3, 3, 3, 418.22, 418.22, 258.76, 258.76, 113.43, 113.43, 46.03, 0,     0,     14.23, 'S',  9],
-  /* B8 */ ['S', 311.26, 3, 3, 3, 3, 311.26, 311.26, 224.14, 224.14, 56.42,  56.42,  30.70, 14.60, 14.60, 9.21,  'S',  9],
-  /* B9 */ ['S', 366.43, 3, 3, 3, 3, 366.43, 366.43, 247.78, 247.78, 84.43,  84.43,  34.22, 1.80,  1.80,  10.85, 'S',  6],
+  //         A    B       C  D  E  F  G       H       I       J       K       L       M      N      O      P      R   S  T    Q
+  //                                                                                    (só B2/B8)    vagas  ilum  piso fech.
+  /* B1 */ ['S', 394.77, 3, 3, 3, 3, 394.77, 394.77, 303.07, 303.07, 24.10,  24.10,  67.61, 0,     0,     20.79, 11, 8, 0, 'S'],
+  /* B2 */ ['S', 602.90, 3, 3, 3, 3, 602.90, 602.90, 338.02, 338.02, 192.51, 192.51, 72.37, 13.06, 13.06, 17.90, 11, 8, 0, 'S'],
+  /* B3 */ ['S', 344.63, 3, 3, 3, 3, 344.63, 344.63, 215.93, 215.93, 116.21, 116.21, 12.49, 0,     0,     13.33, 11, 8, 0, 'S'],
+  /* B4 */ ['S', 338.82, 3, 3, 3, 3, 338.82, 338.82, 207.78, 207.78, 70.69,  70.69,  60.35, 0,     0,     15.81,  8, 8, 0, 'S'],
+  /* B5 */ ['S', 393.77, 3, 3, 3, 3, 393.77, 393.77, 254.41, 254.41, 121.34, 121.34, 18.03, 0,     0,     16.80, 10, 8, 0, 'S'],
+  /* B6 */ ['S', 382.24, 3, 3, 3, 3, 382.24, 382.24, 249.13, 249.13, 111.80, 111.80, 21.31, 0,     0,     16.89, 12, 8, 0, 'S'],
+  /* B7 */ ['S', 418.22, 3, 3, 3, 3, 418.22, 418.22, 258.76, 258.76, 113.43, 113.43, 46.03, 0,     0,     14.23,  9, 8, 0, 'S'],
+  /* B8 */ ['S', 311.26, 3, 3, 3, 3, 311.26, 311.26, 224.14, 224.14, 56.42,  56.42,  30.70, 14.60, 14.60, 9.21,   9, 8, 0, 'S'],
+  /* B9 */ ['S', 366.43, 3, 3, 3, 3, 366.43, 366.43, 247.78, 247.78, 84.43,  84.43,  34.22, 0,     0,     10.85,  6, 8, 0, 'S'],
 ];
 
 // Estado das medicoes: [blocoIdx][etapaIdx] = {total, exec, statusSimples}
@@ -639,16 +642,16 @@ let COMS  = [
   {t:'info', d:'12/05/2026', h:'Início da obra — Bloco 1', p:'Os serviços de recuperação estrutural e pintura foram iniciados no Bloco 1 (Box 68 ao Box 73). O canteiro de obras está mobilizado e os trabalhos ocorrem dentro do horário regulamentar, de segunda a sexta-feira.', link:'https://drive.google.com/drive/folders/1BdujKSWLtzJo__2ksdeapzdGUGE42sqH?usp=drive_link'},
 ];
 const TLV = [
-  {s:'wip',  d:'MAI 2026', h:'Início da obra — Bloco 1',   p:'Mobilização da equipe. Início dos serviços de recuperação estrutural e revestimento nos Box 68 ao Box 73.'},
-  {s:'fut',  d:'JUN 2026', h:'Início previsto — Bloco 2',  p:'Box 74 ao Box 03 · Transformador · Almoxarifado Gilmar. Previsão: 17/06/2026.'},
-  {s:'fut',  d:'AGO 2026', h:'Início previsto — Bloco 3',  p:'Box 04 ao Box 13. Previsão: 06/08/2026.'},
-  {s:'fut',  d:'SET 2026', h:'Início previsto — Bloco 4',  p:'Box 14 ao Box 22. Previsão: 11/09/2026.'},
-  {s:'fut',  d:'NOV 2026', h:'Início previsto — Bloco 5',  p:'Box 23 ao Box 32. Previsão: 03/11/2026.'},
-  {s:'fut',  d:'DEZ 2026', h:'Início previsto — Bloco 6',  p:'Box 33 ao Box 44. Previsão: 31/12/2026.'},
-  {s:'fut',  d:'MAR 2027', h:'Início previsto — Bloco 7',  p:'Box 45 ao Box 52 · Duplo até o fundo. Previsão: 02/03/2027.'},
-  {s:'fut',  d:'ABR 2027', h:'Início previsto — Bloco 8',  p:'Box 53 ao Box 60 · Box 61. Previsão: 22/04/2027.'},
-  {s:'fut',  d:'JUN 2027', h:'Início previsto — Bloco 9',  p:'Box 62 ao Box 67. Previsão: 11/06/2027.'},
-  {s:'fut',  d:'AGO 2027', h:'Previsão de conclusão geral', p:'Entrega final com todos os blocos concluídos. Data prevista: 19/08/2027.'},
+  {s:'wip',  d:'12/05/2026', h:'Início da obra — Bloco 1',        p:'Mobilização da equipe. Início dos serviços de recuperação estrutural e revestimento nos Box 68 ao Box 73.'},
+  {s:'wip',  d:'02/06/2026', h:'Início do Bloco 2',               p:'Box 74 ao Box 03 · Transformador · Almoxarifado Gilmar. Início efetivo: 02/06/2026.'},
+  {s:'fut',  d:'AGO 2026',   h:'Início previsto — Bloco 3',       p:'Box 04 ao Box 13. Previsão: 05/08/2026.'},
+  {s:'fut',  d:'SET 2026',   h:'Início previsto — Bloco 4',       p:'Box 14 ao Box 22. Previsão: 10/09/2026.'},
+  {s:'fut',  d:'OUT 2026',   h:'Início previsto — Bloco 5',       p:'Box 23 ao Box 32. Previsão: 30/10/2026.'},
+  {s:'fut',  d:'DEZ 2026',   h:'Início previsto — Bloco 6',       p:'Box 33 ao Box 44. Previsão: 30/12/2026.'},
+  {s:'fut',  d:'MAR 2027',   h:'Início previsto — Bloco 7',       p:'Box 45 ao Box 52 · Duplo até o fundo. Previsão: 02/03/2027.'},
+  {s:'fut',  d:'ABR 2027',   h:'Início previsto — Bloco 8',       p:'Box 53 ao Box 61 · Portão 1 (P1). Previsão: 22/04/2027.'},
+  {s:'fut',  d:'JUN 2027',   h:'Início previsto — Bloco 9',       p:'Box 62 ao Box 67. Previsão: 11/06/2027.'},
+  {s:'fut',  d:'AGO 2027',   h:'Previsão de conclusão geral',     p:'Entrega final com todos os blocos concluídos. Data prevista: 19/08/2027.'},
 ];
 
 // ============================================================
