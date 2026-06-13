@@ -333,7 +333,7 @@ body{font-family:var(--fn);background:var(--bg);color:var(--tx);font-size:14px;}
 <nav class="nav">
   <div class="nav-tabs">
     <button class="nb on" onclick="S('dash',this)"><i class="ti ti-layout-dashboard"></i>Dashboard</button>
-    <button class="nb" onclick="S('com',this)"><i class="ti ti-notebook"></i>Diário de Obra</button>
+    <button class="nb" onclick="S('com',this)"><i class="ti ti-notebook"></i>Diário de Obra <span id="badge-novo" style="display:none;background:#dc2626;color:#fff;font-size:9px;font-weight:800;border-radius:8px;padding:1px 5px;vertical-align:middle;margin-left:2px;">NOVO</span></button>
     <button class="nb" onclick="S('blocos',this)"><i class="ti ti-grid-dots"></i>Etapas da Obra</button>
     <button class="nb" onclick="S('crono',this)"><i class="ti ti-calendar"></i>Cronograma</button>
     <button class="nb" onclick="S('tl',this)"><i class="ti ti-timeline"></i>Histórico</button>
@@ -353,7 +353,8 @@ body{font-family:var(--fn);background:var(--bg);color:var(--tx);font-size:14px;}
     </div>
     <i class="ti ti-arrow-right" style="font-size:16px;color:var(--M);flex-shrink:0;"></i>
   </div>
-  <div id="d-gpc"></div>
+  <div id="d-destaque" style="background:#fff;border:1px solid var(--bd);border-radius:12px;padding:14px 18px;margin-bottom:14px;"></div>
+      <div id="d-gpc"></div>
   <div class="kpi-g" id="d-kpi"></div>
   <p class="st" style="margin-bottom:12px;">RESUMO POR BLOCO</p>
   <div id="d-res"></div>
@@ -655,16 +656,18 @@ function getTLV(){
   const itens = BLOCOS.map(function(b){
     const ini = new Date(b.ini+'T00:00:00');
     const jaIniciou = ini <= hoje;
-    const datFmt = ini.toLocaleDateString('pt-BR');
+    const iniReal = b.iniReal ? new Date(b.iniReal+'T00:00:00') : null;
+    const datFmt = (iniReal || ini).toLocaleDateString('pt-BR');
     const s = b.st==='concluido' ? 'done' : jaIniciou ? 'wip' : 'fut';
     const hdr = b.st==='concluido'
       ? 'Conclusão — '+b.n
       : jaIniciou
         ? 'Início efetivo — '+b.n
         : 'Início previsto — '+b.n;
-    const txt = b.v + (jaIniciou
-      ? '. Início: '+datFmt+'.'
-      : '. Previsão: '+datFmt+'.');
+    const txtIni = b.iniReal
+      ? '. Início efetivo: '+datFmt+'.'
+      : jaIniciou ? '. Início: '+datFmt+'.' : '. Previsão: '+datFmt+'.';
+    const txt = b.v + txtIni;
     return {s:s, d:datFmt, h:hdr, p:txt};
   });
   // Adiciona marco de conclusão geral ao final
@@ -764,12 +767,35 @@ function rDash(){
   const pend = BLOCOS.filter(b=>b.st==='pendente').length;
 
   const r=36,cx=45,cy=45,ci=2*Math.PI*r,da=(ci*gp/100).toFixed(1);
+  // Card de destaque: % global + data prevista de conclusão
+  const contratualFinal = fimContratual(BLOCOS.length-1).toLocaleDateString('pt-BR');
+  const corGp = gp>=75?'var(--ok)':gp>=40?'var(--wip)':'var(--M)';
+  document.getElementById('d-destaque').innerHTML=`
+    <div style="display:flex;align-items:center;justify-content:center;gap:0;flex-direction:column;padding:10px 0 4px;">
+      <span style="font-size:52px;font-weight:800;line-height:1;color:${corGp};letter-spacing:-1px;">${gp}%</span>
+      <span style="font-size:11px;font-weight:600;color:var(--mt);letter-spacing:.5px;margin-top:2px;">DA OBRA CONCLUÍDO</span>
+    </div>
+    <div style="display:flex;gap:18px;justify-content:center;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--bd);margin-top:6px;">
+      <div style="text-align:center;">
+        <div style="font-size:10px;color:var(--mt);font-weight:600;letter-spacing:.4px;">PREVISÃO DE ENTREGA</div>
+        <div style="font-size:15px;font-weight:700;color:var(--M);margin-top:2px;">${contratualFinal}</div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:10px;color:var(--mt);font-weight:600;letter-spacing:.4px;">BLOCOS CONCLUÍDOS</div>
+        <div style="font-size:15px;font-weight:700;color:var(--ok);margin-top:2px;">${done} <span style="font-size:11px;color:var(--mt);">de 10</span></div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:10px;color:var(--mt);font-weight:600;letter-spacing:.4px;">EM ANDAMENTO</div>
+        <div style="font-size:15px;font-weight:700;color:var(--wip);margin-top:2px;">${wip} <span style="font-size:11px;color:var(--mt);">bloco${wip!==1?'s':''}</span></div>
+      </div>
+    </div>`;
+
   document.getElementById('d-gpc').innerHTML=`<div class="gpc">
     <div class="gpc-ring"><svg width="88" height="88" viewBox="0 0 90 90"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#f0ece6" stroke-width="7"/><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#5C2444" stroke-width="7" stroke-dasharray="${da} ${ci.toFixed(1)}" stroke-linecap="round"/></svg><div class="gpc-n"><span>${gp}%</span><small>GLOBAL</small></div></div>
     <div class="gpc-rows">
-      <div class="gr"><span class="gr-l">CONCLUÍDOS</span><div class="gr-t"><div class="gr-f f-ok" style="width:${Math.round(done/10*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${done}/9</span></div>
-      <div class="gr"><span class="gr-l">EM ANDAMENTO</span><div class="gr-t"><div class="gr-f f-wip" style="width:${Math.round(wip/10*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${wip}/9</span></div>
-      <div class="gr"><span class="gr-l">PENDENTES</span><div class="gr-t"><div class="gr-f f-G" style="width:${Math.round(pend/10*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${pend}/9</span></div>
+      <div class="gr"><span class="gr-l">CONCLUÍDOS</span><div class="gr-t"><div class="gr-f f-ok" style="width:${Math.round(done/10*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${done}/10</span></div>
+      <div class="gr"><span class="gr-l">EM ANDAMENTO</span><div class="gr-t"><div class="gr-f f-wip" style="width:${Math.round(wip/10*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${wip}/10</span></div>
+      <div class="gr"><span class="gr-l">PENDENTES</span><div class="gr-t"><div class="gr-f f-G" style="width:${Math.round(pend/10*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${pend}/10</span></div>
     </div>
   </div>`;
 
@@ -892,10 +918,16 @@ function rCrono(){
 function rTL(){ document.getElementById('tl-bd').innerHTML=getTLV().map(e=>`<div class="tl-i"><div class="tl-d ${e.s}"></div><div class="tl-dt">${e.d}</div><div class="tl-h">${e.h}</div><div class="tl-p">${e.p}</div></div>`).join(''); }
 
 function rCom(){
+  // Verificar se há postagem mais recente do que a última lida
+  const lastRead = localStorage.getItem('pAma_lastRead') || '';
+  const badge = document.getElementById('badge-novo');
+  if(badge && COMS.length>0){
+    const newest = COMS[0].d+'|'+COMS[0].h;
+    badge.style.display = (newest !== lastRead) ? 'inline' : 'none';
+  }
   document.getElementById('com-bd').innerHTML = COMS.map((c,i) => `
     <div class="cc ${c.t}">
       <div class="cc-meta">
-        <span class="cc-dt"><i class="ti ti-calendar" style="font-size:11px;vertical-align:-1px;"></i> ${c.d}</span>
         <span class="cc-tag" style="background:${c.t==='warn'?'var(--wip-bg)':c.t==='ok'?'var(--ok-bg)':'var(--MP)'};color:${c.t==='warn'?'var(--wip)':c.t==='ok'?'var(--ok)':'var(--M)'};">${c.t==='warn'?'ATENÇÃO':c.t==='ok'?'CONCLUSÃO':'INFORMATIVO'}</span>
       </div>
       <div class="cc-h">${escHTML(c.h)}</div>
@@ -954,17 +986,35 @@ function renderAdminTable(){
 }
 function salvarFirebase(){
   if(!window._fbSalvar) return;
+  // Adicionar entrada ao log de alterações (máx. 50 registros)
+  if(!window._LOG_ALT) window._LOG_ALT = [];
+  window._LOG_ALT.unshift({dt: new Date().toISOString(), u: 'engenheira'});
+  if(window._LOG_ALT.length > 50) window._LOG_ALT.length = 50;
+
   const dados = {
-    BLOCOS_ST: BLOCOS.map(b=>({pct:b.pct||0, st:b.st})),
+    BLOCOS_ST: BLOCOS.map(b=>({pct:b.pct||0, st:b.st, iniReal:b.iniReal||null, fimReal:b.fimReal||null})),
     MED: MED,
     CAL_MANUAL: CAL_MANUAL,
     COMS: COMS,
+    LOG: window._LOG_ALT,
   };
   window._fbSalvar(dados).catch(e=>console.warn('Firebase erro:',e));
 }
 
 function saveStatus(){
-  BLOCOS.forEach((b,i)=>{ b.st=document.getElementById('inp-st-'+i).value; });
+  const hoje = new Date().toISOString().slice(0,10);
+  BLOCOS.forEach((b,i)=>{
+    const novoSt = document.getElementById('inp-st-'+i).value;
+    // Registrar data real de início ao mudar para "andamento" pela primeira vez
+    if(novoSt==='andamento' && b.st!=='andamento' && !b.iniReal){
+      b.iniReal = hoje;
+    }
+    // Registrar data real de conclusão ao mudar para "concluido"
+    if(novoSt==='concluido' && b.st!=='concluido' && !b.fimReal){
+      b.fimReal = hoje;
+    }
+    b.st = novoSt;
+  });
   Object.keys(_fimCache).forEach(k=>delete _fimCache[k]);
   rDash(); rBlocos(); rCrono(); rTL();
   salvarFirebase();
@@ -1059,6 +1109,9 @@ function addC(){
   document.getElementById('c-txt').value='';
   document.getElementById('c-link').value='';
   m.textContent='✓ COMUNICADO PUBLICADO.'; m.style.color='var(--ok)';
+  // Mostrar badge "NOVO" na aba Diário
+  const badge=document.getElementById('badge-novo');
+  if(badge){ badge.style.display='inline'; localStorage.setItem('pAma_lastRead',''); }
   setTimeout(()=>{ m.textContent=''; }, 3500);
 }
 
@@ -1086,7 +1139,7 @@ const FERIADOS_NOME = {
   '2027-09-07':'Independência do Brasil','2027-09-20':'Revolução Farroupilha'
 };
 const OBRA_INI  = new Date('2026-05-12T00:00:00');
-const OBRA_FIM  = new Date('2027-08-19T00:00:00');
+const OBRA_FIM  = new Date('2027-09-10T00:00:00'); // fim do Bloco 10
 const MESES_PT  = ['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
 const DOWS_PT   = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
 
@@ -1130,9 +1183,26 @@ function fimContratual(bi){
 function contarDiasPorBloco(){
   const res = BLOCOS.map(()=>({trab:0, naoTrab:0, contratual:0}));
   BLOCOS.forEach((b,i)=>{ res[i].contratual = b.d; });
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
 
-  // Apenas dias marcados explicitamente
+  // Percorrer cada dia passado: úteis sem marcação contam como trabalhado automaticamente
+  let c = new Date(OBRA_INI); c.setHours(0,0,0,0);
+  while(c < hoje){
+    const ds = c.toISOString().slice(0,10);
+    const dw = c.getDay();
+    const bi = blocoDodia(ds);
+    if(bi >= 0){
+      const manual = CAL_MANUAL[ds];
+      if(manual === 'trabalhado')          res[bi].trab++;
+      else if(manual === 'nao_trabalhado') res[bi].naoTrab++;
+      else if(dw > 0 && dw < 6 && !FERIADOS_SET.has(ds)) res[bi].trab++; // automático
+    }
+    c.setDate(c.getDate()+1);
+  }
+  // Dias futuros — só marcações explícitas antecipadas
   Object.entries(CAL_MANUAL).forEach(([ds, estado])=>{
+    const d = new Date(ds+'T00:00:00'); d.setHours(0,0,0,0);
+    if(d < hoje) return; // já processado no loop acima
     const bi = blocoDodia(ds);
     if(bi < 0) return;
     if(estado === 'trabalhado')          res[bi].trab++;
@@ -1387,6 +1457,12 @@ function S(id,b){
   if(b)b.classList.add('on');
   // Rechama rCal ao abrir o calendário para aplicar permissões de admin
   if(id==='cal') rCal();
+  // Ao abrir o Diário, esconder o badge e registrar leitura
+  if(id==='com'){
+    const badge=document.getElementById('badge-novo');
+    if(badge) badge.style.display='none';
+    if(COMS.length>0) localStorage.setItem('pAma_lastRead', COMS[0].d+'|'+COMS[0].h);
+  }
 }
 
 function irDiario(){
@@ -1410,7 +1486,7 @@ rDash(); rBlocos(); rCrono(); rTL(); rCom(); rCal(); initQR();
 window.addEventListener('load', ()=>{
   if(window._fbCarregar){
     window._fbCarregar(dados => {
-      if(dados.BLOCOS_ST) dados.BLOCOS_ST.forEach((s,i)=>{ if(BLOCOS[i] && s){ BLOCOS[i].pct=s.pct||0; if(ST_OPTS.includes(s.st)) BLOCOS[i].st=s.st; } });
+      if(dados.BLOCOS_ST) dados.BLOCOS_ST.forEach((s,i)=>{ if(BLOCOS[i] && s){ BLOCOS[i].pct=s.pct||0; if(ST_OPTS.includes(s.st)) BLOCOS[i].st=s.st; if(s.iniReal) BLOCOS[i].iniReal=s.iniReal; if(s.fimReal) BLOCOS[i].fimReal=s.fimReal; } });
       if(dados.MED) dados.MED.forEach(function(bloco,bi){
         if(!bloco || !MED[bi]) return;
         bloco.forEach(function(et,ei){
@@ -1425,6 +1501,7 @@ window.addEventListener('load', ()=>{
       });
       if(dados.CAL_MANUAL) Object.assign(CAL_MANUAL, dados.CAL_MANUAL);
       if(dados.COMS && dados.COMS.length){ COMS.length=0; dados.COMS.forEach(c=>COMS.push(c)); }
+      if(dados.LOG && Array.isArray(dados.LOG)) window._LOG_ALT = dados.LOG;
       Object.keys(_fimCache).forEach(k=>delete _fimCache[k]);
       rDash(); rBlocos(); rCrono(); rTL(); rCom(); rCal();
     });
