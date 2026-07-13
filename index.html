@@ -333,18 +333,22 @@ body{font-family:var(--fn);background:var(--bg);color:var(--tx);font-size:14px;}
 <nav class="nav">
   <div class="nav-tabs">
     <button class="nb on" onclick="S('dash',this)"><i class="ti ti-layout-dashboard"></i>Dashboard</button>
-    <button class="nb" onclick="S('com',this)"><i class="ti ti-notebook"></i>Diário de Obra <span id="badge-novo" style="display:none;background:#dc2626;color:#fff;font-size:9px;font-weight:800;border-radius:8px;padding:1px 5px;vertical-align:middle;margin-left:2px;">NOVO</span></button>
-    <button class="nb" onclick="S('blocos',this)"><i class="ti ti-grid-dots"></i>Etapas da Obra</button>
+    <button class="nb" onclick="S('com',this)"><i class="ti ti-notebook"></i>Diário de Obra</button>
+    <button class="nb" onclick="S('blocos',this)"><i class="ti ti-grid-dots"></i>Andamento</button>
     <button class="nb" onclick="S('crono',this)"><i class="ti ti-calendar"></i>Cronograma</button>
     <button class="nb" onclick="S('tl',this)"><i class="ti ti-timeline"></i>Histórico</button>
-    <button class="nb" onclick="S('cal',this)"><i class="ti ti-calendar-month"></i>Calendário</button>
+    <button class="nb" id="nb-cal" onclick="S('cal',this)" style="display:none;"><i class="ti ti-calendar-month"></i>Calendário</button>
     <button class="nb" onclick="S('admin',this)" style="opacity:.35;" title="Painel administrativo"><i class="ti ti-settings"></i></button>
   </div>
 </nav>
 
 <!-- DASHBOARD -->
 <div class="sec on" id="sec-dash">
-  <!-- FAIXA INFORMATIVA -->
+
+  <!-- FAIXA CONTEXTO -->
+  <div id="d-contexto"></div>
+
+  <!-- FAIXA DIÁRIO -->
   <div onclick="irDiario()" style="background:var(--MP);border:1px solid var(--MB);border-radius:10px;padding:13px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;cursor:pointer;transition:background .2s;" onmouseover="this.style.background='#f0e0e8'" onmouseout="this.style.background='var(--MP)'">
     <i class="ti ti-notebook" style="font-size:22px;color:var(--M);flex-shrink:0;"></i>
     <div style="flex:1;">
@@ -353,8 +357,8 @@ body{font-family:var(--fn);background:var(--bg);color:var(--tx);font-size:14px;}
     </div>
     <i class="ti ti-arrow-right" style="font-size:16px;color:var(--M);flex-shrink:0;"></i>
   </div>
-  <div id="d-destaque" style="background:#fff;border:1px solid var(--bd);border-radius:12px;padding:14px 18px;margin-bottom:14px;"></div>
-      <div id="d-gpc"></div>
+
+  <div id="d-gpc"></div>
   <div class="kpi-g" id="d-kpi"></div>
   <p class="st" style="margin-bottom:12px;">RESUMO POR BLOCO</p>
   <div id="d-res"></div>
@@ -362,8 +366,8 @@ body{font-family:var(--fn);background:var(--bg);color:var(--tx);font-size:14px;}
 
 <!-- BLOCOS -->
 <div class="sec" id="sec-blocos">
-  <p class="st">ETAPAS DA OBRA</p>
-  <p class="ss">Detalhamento técnico das atividades executadas e em andamento. Clique no bloco para expandir.</p>
+  <p class="st">ANDAMENTO DA OBRA</p>
+  <p class="ss">Situação atual de cada bloco. Clique em um bloco para ver o detalhamento das etapas.</p>
   <div id="bl-list"></div>
 </div>
 
@@ -443,7 +447,7 @@ body{font-family:var(--fn);background:var(--bg);color:var(--tx);font-size:14px;}
       <div class="as-sub">Atualize o status de execução de cada bloco. O percentual de avanço é calculado automaticamente a partir das medições das etapas.</div>
       <div style="overflow-x:auto;">
         <table class="admin-table">
-          <thead><tr><th>Bloco</th><th>Área</th><th>Status</th></tr></thead>
+          <thead><tr><th>Bloco</th><th>Área</th><th>Início real</th><th>Status</th></tr></thead>
           <tbody id="admin-tbl-body"></tbody>
         </table>
       </div>
@@ -462,8 +466,6 @@ body{font-family:var(--fn);background:var(--bg);color:var(--tx);font-size:14px;}
         <p class="sv-msg" id="sv-med-msg"></p>
       </div>
     </div>
-
-
 
     <!-- 3. COMUNICADOS -->
     <div class="as">
@@ -513,8 +515,8 @@ body{font-family:var(--fn);background:var(--bg);color:var(--tx);font-size:14px;}
       <strong>Início da obra:</strong> 12/05/2026 · <strong>Conclusão prevista:</strong> 19/08/2027<br>
       <strong>Horário:</strong> 08:00–12:00 e 13:30–17:30 (segunda a sexta-feira)
     </div>
-    <button class="footer-wa" onclick="oWA()">
-      <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.978-1.413A9.953 9.953 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18.182a8.18 8.18 0 0 1-4.168-1.138l-.299-.178-3.093.877.877-3.094-.195-.308A8.182 8.182 0 1 1 12 20.182z"/></svg>
+    <button class="footer-wa" onclick="oWA()" style="font-size:13px;padding:11px 20px;">
+      <svg viewBox="0 0 24 24" style="width:18px;height:18px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.978-1.413A9.953 9.953 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18.182a8.18 8.18 0 0 1-4.168-1.138l-.299-.178-3.093.877.877-3.094-.195-.308A8.182 8.182 0 1 1 12 20.182z"/></svg>
       FALAR COM A ENGENHEIRA
     </button>
   </div>
@@ -564,33 +566,24 @@ const SITE_URL = 'https://engjessicamoraes.github.io/obraparqueamazonia';
 // ============================================================
 //  ETAPAS TÉCNICAS — definição com unidade
 //  tipo: 'm2' | 'un' | 'status'
-//  cod: letra de referência conforme planilha de levantamento
 // ============================================================
 const ETAPAS = [
-  {id:1,  cod:'A', n:'Mobilização, preparação e isolamento do canteiro de obras',                              tipo:'status'},
-  {id:2,  cod:'B', n:'Lavagem hidráulica das superfícies',                                        tipo:'m2'},
-  {id:3,  cod:'C', n:'Remoção das calhas',                                                        tipo:'un'},
-  {id:4,  cod:'D', n:'Remoção do concreto deteriorado e exposição das armaduras',                 tipo:'un'},
-  {id:5,  cod:'E', n:'Tratamento de limpeza e desoxidação das armaduras',                         tipo:'un'},
-  {id:6,  cod:'F', n:'Aplicação de inibidor de corrosão nas armaduras',                           tipo:'un'},
-  {id:7,  cod:'G', n:'Recomposição do cobrimento com argamassa de reparo estrutural',             tipo:'m2'},
-  {id:8,  cod:'H', n:'Aplicação de fundo preparador e selador de superfícies',                                             tipo:'m2'},
-  {id:9,  cod:'I', n:'Pintura do teto — 1ª demão',                                               tipo:'m2'},
-  {id:10, cod:'J', n:'Pintura do teto — 2ª demão',                                               tipo:'m2'},
-  {id:11, cod:'K', n:'Pintura de paredes — 1ª demão',                                            tipo:'m2'},
-  {id:12, cod:'L', n:'Pintura de paredes — 2ª demão',                                            tipo:'m2'},
-  {id:13, cod:'M', n:'Pintura dos pilares e colunas',                                             tipo:'m2'},
-  {id:14, cod:'N', n:'Pintura das portas dos transformadores',                                                        tipo:'m2',     blocos:[1,7]}, // índices 1=B2, 7=B8
-  {id:15, cod:'O', n:'Recomposição do revestimento argamassado sobre as vergas das portas dos transformadores',           tipo:'m2',     blocos:[1,7]}, // índices 1=B2, 7=B8
-  {id:16, cod:'P', n:'Pintura de delimitação das vagas',                                          tipo:'m2'},
-  {id:17, cod:'R', n:'Demarcação e pintura da identificação numérica das vagas de estacionamento',                                            tipo:'un'},
-  {id:18, cod:'S', n:'Instalação de pontos de iluminação',                                        tipo:'un'},
-  {id:19, cod:'T1', n:'Recuperação estrutural do piso do corredor de circulação de veículos',              tipo:'m2',     blocos:[9]},
-  {id:20, cod:'T2', n:'Pintura de demarcação do corredor de circulação de veículos',                   tipo:'m2',     blocos:[9]},
-  {id:21, cod:'Q',  n:'Limpeza geral e desmobilização do canteiro — fechamento do bloco',                                tipo:'status'},
+  {id:1,  n:'Preparação e isolamento do canteiro de obras',                         tipo:'status'},
+  {id:2,  n:'Limpeza e lavagem hidráulica das superfícies',                         tipo:'m2'},
+  {id:3,  n:'Remoção das calhas e tampas de inspeção',                              tipo:'un'},
+  {id:4,  n:'Inspeção e mapeamento das manifestações patológicas',                  tipo:'un'},
+  {id:5,  n:'Remoção do concreto deteriorado e exposição das armaduras',            tipo:'un'},
+  {id:6,  n:'Tratamento de limpeza e desoxidação das armaduras',                    tipo:'un'},
+  {id:7,  n:'Aplicação de inibidor de corrosão nas armaduras',                      tipo:'un'},
+  {id:8,  n:'Recomposição do cobrimento com argamassa de reparo estrutural',        tipo:'un'},
+  {id:9,  n:'Regularização e preparo da base para pintura',                         tipo:'m2'},
+  {id:10, n:'Pintura do teto — 1ª demão',                                           tipo:'m2'},
+  {id:11, n:'Pintura do teto — 2ª demão',                                           tipo:'m2'},
+  {id:12, n:'Pintura de paredes — 1ª demão',                                        tipo:'m2'},
+  {id:13, n:'Pintura de paredes — 2ª demão',                                        tipo:'m2'},
+  {id:14, n:'Pintura de detalhes e acabamentos',                                    tipo:'m2'},
+  {id:15, n:'Pintura de delimitação das vagas',                                     tipo:'m2'},
 ];
-
-// T1 e T2 (índices 18 e 19): exclusivas do Bloco 10 (índice 9) — campo blocos:[9]
 
 const UNIDADE_LABEL = {m2:'m²', un:'un', status:'—'};
 
@@ -598,47 +591,44 @@ const UNIDADE_LABEL = {m2:'m²', un:'un', status:'—'};
 //  BLOCOS — datas calculadas em dias úteis (sem sábado/domingo/feriados POA)
 // ============================================================
 const BLOCOS = [
-  {id:1, n:'BLOCO 1', v:'Box 68 ao Box 73',                                            d:25, ini:'2026-05-12', fim:'16/06/2026', st:'andamento'},
-  {id:2, n:'BLOCO 2', v:'Box 74 ao Box 03 · Transformador · Almoxarifado Gilmar',      d:35, ini:'2026-06-02', fim:'21/07/2026', st:'andamento'},
-  {id:3, n:'BLOCO 3', v:'Box 04 ao Box 13',                                           d:25, ini:'2026-08-05', fim:'09/09/2026', st:'pendente'},
-  {id:4, n:'BLOCO 4', v:'Box 14 ao Box 22',                                           d:35, ini:'2026-09-10', fim:'29/10/2026', st:'pendente'},
-  {id:5, n:'BLOCO 5', v:'Box 23 ao Box 32',                                           d:40, ini:'2026-10-30', fim:'29/12/2026', st:'pendente'},
-  {id:6, n:'BLOCO 6', v:'Box 33 ao Box 44',                                           d:40, ini:'2026-12-30', fim:'01/03/2027', st:'pendente'},
-  {id:7, n:'BLOCO 7', v:'Box 45 ao Box 52 · Duplo até o fundo',                       d:35, ini:'2027-03-02', fim:'20/04/2027', st:'pendente'},
-  {id:8, n:'BLOCO 8', v:'Box 53 ao Box 60 · Box 61 ao lado do Portão 1 (P1)',        d:35, ini:'2027-04-22', fim:'10/06/2027', st:'pendente'},
-  {id:9,  n:'BLOCO 9',  v:'Box 62, 63, 64 ao 67',                                     d:50, ini:'2027-06-11', fim:'19/08/2027', st:'pendente'},
-  {id:10, n:'BLOCO 10', v:'Caminho de circulação — recuperação e pintura do piso',    d:15, ini:'2027-08-20', fim:'10/09/2027', st:'pendente'},
+  {id:1, n:'BLOCO 1', v:'Box 68 ao Box 73',                                            d:25, ini:'2026-05-12', fim:'16/06/2026', st:'andamento', iniReal:'2026-05-12'},
+  {id:2, n:'BLOCO 2', v:'Box 74 ao Box 03 · Transformador · Almoxarifado Gilmar',      d:35, ini:'2026-06-17', fim:'04/08/2026', st:'pendente',  iniReal:''},
+  {id:3, n:'BLOCO 3', v:'Box 04 ao Box 13',                                            d:25, ini:'2026-08-05', fim:'09/09/2026', st:'pendente',  iniReal:''},
+  {id:4, n:'BLOCO 4', v:'Box 14 ao Box 22',                                            d:35, ini:'2026-09-10', fim:'29/10/2026', st:'pendente',  iniReal:''},
+  {id:5, n:'BLOCO 5', v:'Box 23 ao Box 32',                                            d:40, ini:'2026-10-30', fim:'29/12/2026', st:'pendente',  iniReal:''},
+  {id:6, n:'BLOCO 6', v:'Box 33 ao Box 44',                                            d:40, ini:'2026-12-30', fim:'01/03/2027', st:'pendente',  iniReal:''},
+  {id:7, n:'BLOCO 7', v:'Box 45 ao Box 52 · Duplo até o fundo',                        d:35, ini:'2027-03-02', fim:'20/04/2027', st:'pendente',  iniReal:''},
+  {id:8, n:'BLOCO 8', v:'Box 53 ao Box 60 · Box 61 ao lado do Portão 1 (P1)',          d:35, ini:'2027-04-22', fim:'10/06/2027', st:'pendente',  iniReal:''},
+  {id:9, n:'BLOCO 9', v:'Box 62, 63, 64 ao 67',                                        d:50, ini:'2027-06-11', fim:'19/08/2027', st:'pendente',  iniReal:''},
 ];
 
-// ============================================================
-//  LEVANTAMENTO INICIAL — totais por bloco e etapa
-//  Ordem das colunas segue a ordem de ETAPAS: A B C D E F G H I J K L M N O P Q
-//  Inteiro = unidade (un) | Decimal = m²  |  'S' = etapa de status (sem medição numérica)
-// ============================================================
-const LEV_INICIAL = [
-  //         A    B       C  D  E  F  G       H       I       J       K       L       M      N       O       P      R   S   Q
-  //                                                                                   (só B2/B8)           vagas  ilum fech.
-  /* B1  */ ['S', 394.77, 3, 3, 3, 3, 394.77, 394.77, 303.07, 303.07, 24.10,  24.10,  67.61, 0,      0,      20.79, 11, 8, 0,      0,      'S'],
-  /* B2  */ ['S', 602.90, 3, 3, 3, 3, 602.90, 602.90, 338.02, 338.02, 192.51, 192.51, 72.37, 13.06,  13.06,  17.90, 11, 8, 0,      0,      'S'],
-  /* B3  */ ['S', 344.63, 3, 3, 3, 3, 344.63, 344.63, 215.93, 215.93, 116.21, 116.21, 12.49, 0,      0,      13.33, 11, 8, 0,      0,      'S'],
-  /* B4  */ ['S', 338.82, 3, 3, 3, 3, 338.82, 338.82, 207.78, 207.78, 70.69,  70.69,  60.35, 0,      0,      15.81,  8, 8, 0,      0,      'S'],
-  /* B5  */ ['S', 393.77, 3, 3, 3, 3, 393.77, 393.77, 254.41, 254.41, 121.34, 121.34, 18.03, 0,      0,      16.80, 10, 8, 0,      0,      'S'],
-  /* B6  */ ['S', 382.24, 3, 3, 3, 3, 382.24, 382.24, 249.13, 249.13, 111.80, 111.80, 21.31, 0,      0,      16.89, 12, 8, 0,      0,      'S'],
-  /* B7  */ ['S', 418.22, 3, 3, 3, 3, 418.22, 418.22, 258.76, 258.76, 113.43, 113.43, 46.03, 0,      0,      14.23,  9, 8, 0,      0,      'S'],
-  /* B8  */ ['S', 311.26, 3, 3, 3, 3, 311.26, 311.26, 224.14, 224.14, 56.42,  56.42,  30.70, 14.60,  14.60,  9.21,   9, 8, 0,      0,      'S'],
-  /* B9  */ ['S', 366.43, 3, 3, 3, 3, 366.43, 366.43, 247.78, 247.78, 84.43,  84.43,  34.22, 0,      0,      10.85,  6, 8, 247.37, 247.37, 'S'],
-  /* B10 */ ['S', 0,      0, 0, 0, 0, 0,      0,      0,      0,      0,      0,      0,     0,      0,      0,       0, 0, 247.37, 247.37, 'S'],
-];
+// Calcula a data de término real a partir do início real + dias úteis do contrato
+function calcFimReal(b){
+  if(!b.iniReal) return null;
+  let c = new Date(b.iniReal+'T00:00:00'), cont = 0;
+  const feriados = ['2026-06-04','2026-09-07','2026-09-20','2026-10-12','2026-11-02','2026-11-15','2026-11-20','2026-12-25','2027-01-01','2027-02-02','2027-02-15','2027-02-16','2027-04-02','2027-04-21','2027-05-01','2027-06-03','2027-09-07','2027-09-20'];
+  while(cont < b.d){
+    const dw = c.getDay(), ds = c.toISOString().slice(0,10);
+    if(dw>0 && dw<6 && !feriados.includes(ds)) cont++;
+    if(cont < b.d) c.setDate(c.getDate()+1);
+  }
+  return c.toLocaleDateString('pt-BR');
+}
 
-// Estado das medicoes: [blocoIdx][etapaIdx] = {total, exec, statusSimples}
-// Totais pre-carregados com o levantamento inicial — editaveis pelo admin
-const MED = BLOCOS.map((b, bi) =>
-  ETAPAS.map((e, ei) => {
-    const v = LEV_INICIAL[bi] ? LEV_INICIAL[bi][ei] : null;
-    if(e.tipo === 'status') return {statusSimples:'pendente'};
-    const tot = (typeof v === 'number') ? v : 0;
-    return {total: tot, exec: 0};
-  })
+// Compara início real com previsto e retorna status
+function statusPrazo(b){
+  if(!b.iniReal) return null;
+  const prev = new Date(b.ini+'T00:00:00');
+  const real = new Date(b.iniReal+'T00:00:00');
+  const diff = Math.round((real - prev) / 86400000);
+  if(diff < -2) return {txt: `${Math.abs(diff)}d adiantado`, cor:'var(--ok)', bg:'var(--ok-bg)'};
+  if(diff > 2)  return {txt: `${diff}d de atraso`,           cor:'var(--err)', bg:'var(--err-bg)'};
+  return           {txt: 'No prazo',                          cor:'var(--G)',   bg:'var(--GP)'};
+}
+
+// Estado das medições: [blocoIdx][etapaIdx] = {total, exec, statusSimples}
+const MED = BLOCOS.map(() =>
+  ETAPAS.map(e => e.tipo === 'status' ? {statusSimples:'pendente'} : {total:0, exec:0})
 );
 
 const ST_OPTS  = ['concluido','andamento','pendente','aguardando','atraso'];
@@ -649,57 +639,33 @@ const FILL_CLS = {concluido:'f-ok', andamento:'f-wip', pendente:'', aguardando:'
 let COMS  = [
   {t:'info', d:'12/05/2026', h:'Início da obra — Bloco 1', p:'Os serviços de recuperação estrutural e pintura foram iniciados no Bloco 1 (Box 68 ao Box 73). O canteiro de obras está mobilizado e os trabalhos ocorrem dentro do horário regulamentar, de segunda a sexta-feira.', link:'https://drive.google.com/drive/folders/1BdujKSWLtzJo__2ksdeapzdGUGE42sqH?usp=drive_link'},
 ];
-// TLV é gerado dinamicamente a partir de BLOCOS — atualiza automaticamente
-// quando datas ou status mudam. 'done'=concluído, 'wip'=em andamento, 'fut'=futuro
-function getTLV(){
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
-  const itens = BLOCOS.map(function(b){
-    const ini = new Date(b.ini+'T00:00:00');
-    const jaIniciou = ini <= hoje;
-    const iniReal = b.iniReal ? new Date(b.iniReal+'T00:00:00') : null;
-    const datFmt = (iniReal || ini).toLocaleDateString('pt-BR');
-    const s = b.st==='concluido' ? 'done' : jaIniciou ? 'wip' : 'fut';
-    const hdr = b.st==='concluido'
-      ? 'Conclusão — '+b.n
-      : jaIniciou
-        ? 'Início efetivo — '+b.n
-        : 'Início previsto — '+b.n;
-    const txtIni = b.iniReal
-      ? '. Início efetivo: '+datFmt+'.'
-      : jaIniciou ? '. Início: '+datFmt+'.' : '. Previsão: '+datFmt+'.';
-    const txt = b.v + txtIni;
-    return {s:s, d:datFmt, h:hdr, p:txt};
-  });
-  // Adiciona marco de conclusão geral ao final
-  itens.push({s:'fut', d:'19/08/2027', h:'Previsão de conclusão geral', p:'Entrega final com todos os blocos concluídos. Data prevista: 10/09/2027.'});
-  return itens;
-}
+const TLV = [
+  {s:'wip',  d:'MAI 2026', h:'Início da obra — Bloco 1',   p:'Mobilização da equipe. Início dos serviços de recuperação estrutural e revestimento nos Box 68 ao Box 73.'},
+  {s:'fut',  d:'JUN 2026', h:'Início previsto — Bloco 2',  p:'Box 74 ao Box 03 · Transformador · Almoxarifado Gilmar. Previsão: 17/06/2026.'},
+  {s:'fut',  d:'AGO 2026', h:'Início previsto — Bloco 3',  p:'Box 04 ao Box 13. Previsão: 06/08/2026.'},
+  {s:'fut',  d:'SET 2026', h:'Início previsto — Bloco 4',  p:'Box 14 ao Box 22. Previsão: 11/09/2026.'},
+  {s:'fut',  d:'NOV 2026', h:'Início previsto — Bloco 5',  p:'Box 23 ao Box 32. Previsão: 03/11/2026.'},
+  {s:'fut',  d:'DEZ 2026', h:'Início previsto — Bloco 6',  p:'Box 33 ao Box 44. Previsão: 31/12/2026.'},
+  {s:'fut',  d:'MAR 2027', h:'Início previsto — Bloco 7',  p:'Box 45 ao Box 52 · Duplo até o fundo. Previsão: 02/03/2027.'},
+  {s:'fut',  d:'ABR 2027', h:'Início previsto — Bloco 8',  p:'Box 53 ao Box 60 · Box 61. Previsão: 22/04/2027.'},
+  {s:'fut',  d:'JUN 2027', h:'Início previsto — Bloco 9',  p:'Box 62 ao Box 67. Previsão: 11/06/2027.'},
+  {s:'fut',  d:'AGO 2027', h:'Previsão de conclusão geral', p:'Entrega final com todos os blocos concluídos. Data prevista: 19/08/2027.'},
+];
 
 // ============================================================
 //  CÁLCULO DE PERCENTUAL POR BLOCO (baseado em medições)
 // ============================================================
-function etapasDoBloco(bi){
-  // Retorna apenas as etapas mensuráveis que se aplicam a este bloco.
-  // Etapas com campo 'blocos' só aparecem nos índices listados.
-  return ETAPAS.filter(e => {
-    if(e.tipo === 'status') return false;
-    if(e.blocos && !e.blocos.includes(bi)) return false;
-    return true;
-  });
-}
-
 function calcPct(bi){
   const meds = MED[bi];
-  const etapas = etapasDoBloco(bi);
-  const total = etapas.reduce((s,e) => {
+  const etapasComMed = ETAPAS.filter(e => e.tipo !== 'status');
+  const total = etapasComMed.reduce((s,e,i) => {
     const idx = ETAPAS.indexOf(e);
     return s + (meds[idx].total || 0);
   }, 0);
   if(total === 0) return 0;
-  const exec = etapas.reduce((s,e) => {
+  const exec = etapasComMed.reduce((s,e) => {
     const idx = ETAPAS.indexOf(e);
-    const ex = Math.max(0, meds[idx].exec || 0);
-    return s + Math.min(ex, meds[idx].total || 0);
+    return s + Math.min(meds[idx].exec || 0, meds[idx].total || 0);
   }, 0);
   return Math.round((exec / total) * 100);
 }
@@ -730,7 +696,7 @@ function diasTrab(){
 }
 
 function diasUteisRestantes(){
-  const fim = new Date('2027-09-10');
+  const fim = new Date('2027-08-19');
   const hj  = new Date();
   hj.setHours(0,0,0,0);
   fim.setHours(0,0,0,0);
@@ -755,7 +721,6 @@ function diasUteisRestantes(){
 
 function fc(st){ return FILL_CLS[st]||''; }
 function pillCls(st){ return SPILL[st]||'p-pend'; }
-function escHTML(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 // ============================================================
 //  RENDER DASHBOARD
@@ -766,42 +731,37 @@ function rDash(){
   const wip  = BLOCOS.filter(b=>b.st==='andamento').length;
   const pend = BLOCOS.filter(b=>b.st==='pendente').length;
 
-  const r=36,cx=45,cy=45,ci=2*Math.PI*r,da=(ci*gp/100).toFixed(1);
-  // Card de destaque: % global + data prevista de conclusão
-  const contratualFinal = fimContratual(BLOCOS.length-1).toLocaleDateString('pt-BR');
-  const corGp = gp>=75?'var(--ok)':gp>=40?'var(--wip)':'var(--M)';
-  document.getElementById('d-destaque').innerHTML=`
-    <div style="display:flex;align-items:center;justify-content:center;gap:0;flex-direction:column;padding:10px 0 4px;">
-      <span style="font-size:52px;font-weight:800;line-height:1;color:${corGp};letter-spacing:-1px;">${gp}%</span>
-      <span style="font-size:11px;font-weight:600;color:var(--mt);letter-spacing:.5px;margin-top:2px;">DA OBRA CONCLUÍDO</span>
-    </div>
-    <div style="display:flex;gap:18px;justify-content:center;flex-wrap:wrap;padding:10px 0;border-top:1px solid var(--bd);margin-top:6px;">
-      <div style="text-align:center;">
-        <div style="font-size:10px;color:var(--mt);font-weight:600;letter-spacing:.4px;">PREVISÃO DE ENTREGA</div>
-        <div style="font-size:15px;font-weight:700;color:var(--M);margin-top:2px;">${contratualFinal}</div>
-      </div>
-      <div style="text-align:center;">
-        <div style="font-size:10px;color:var(--mt);font-weight:600;letter-spacing:.4px;">BLOCOS CONCLUÍDOS</div>
-        <div style="font-size:15px;font-weight:700;color:var(--ok);margin-top:2px;">${done} <span style="font-size:11px;color:var(--mt);">de 10</span></div>
-      </div>
-      <div style="text-align:center;">
-        <div style="font-size:10px;color:var(--mt);font-weight:600;letter-spacing:.4px;">EM ANDAMENTO</div>
-        <div style="font-size:15px;font-weight:700;color:var(--wip);margin-top:2px;">${wip} <span style="font-size:11px;color:var(--mt);">bloco${wip!==1?'s':''}</span></div>
-      </div>
-    </div>`;
+  // Frase de contexto — bloco(s) em andamento
+  const wipBlocos = BLOCOS.filter(b=>b.st==='andamento');
+  let contexto = '';
+  if(wipBlocos.length > 0){
+    const nomes = wipBlocos.map(b=>`${b.n} (${b.v.split('·')[0].trim()})`).join(' e ');
+    const ini = wipBlocos[0].iniReal ? new Date(wipBlocos[0].iniReal+'T00:00:00').toLocaleDateString('pt-BR') : new Date(wipBlocos[0].ini+'T00:00:00').toLocaleDateString('pt-BR');
+    contexto = `<div style="background:#fff;border:1px solid var(--bd);border-left:4px solid var(--wip);border-radius:10px;padding:14px 16px;margin-bottom:16px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--wip);margin-bottom:4px;"><i class="ti ti-player-play" style="font-size:11px;vertical-align:-1px;"></i> EM EXECUÇÃO</div>
+      <div style="font-size:14px;font-weight:600;color:var(--tx);">${nomes}</div>
+      <div style="font-size:12px;color:var(--mt);margin-top:3px;">Serviços iniciados em ${ini} · ${b.d} dias úteis previstos</div>
+    </div>`.replace('b.d', wipBlocos[0].d);
+  } else if(done === 9){
+    contexto = `<div style="background:var(--ok-bg);border:1px solid var(--ok-b);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:14px;font-weight:600;color:var(--ok);"><i class="ti ti-check"></i> Obra concluída com sucesso.</div>`;
+  } else {
+    contexto = `<div style="background:var(--pend-bg);border:1px solid var(--pend-b);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:var(--pend);">Obra ainda não iniciada.</div>`;
+  }
+  document.getElementById('d-contexto').innerHTML = contexto;
 
+  const r=36,cx=45,cy=45,ci=2*Math.PI*r,da=(ci*gp/100).toFixed(1);
   document.getElementById('d-gpc').innerHTML=`<div class="gpc">
     <div class="gpc-ring"><svg width="88" height="88" viewBox="0 0 90 90"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#f0ece6" stroke-width="7"/><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#5C2444" stroke-width="7" stroke-dasharray="${da} ${ci.toFixed(1)}" stroke-linecap="round"/></svg><div class="gpc-n"><span>${gp}%</span><small>GLOBAL</small></div></div>
     <div class="gpc-rows">
-      <div class="gr"><span class="gr-l">CONCLUÍDOS</span><div class="gr-t"><div class="gr-f f-ok" style="width:${Math.round(done/10*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${done}/10</span></div>
-      <div class="gr"><span class="gr-l">EM ANDAMENTO</span><div class="gr-t"><div class="gr-f f-wip" style="width:${Math.round(wip/10*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${wip}/10</span></div>
-      <div class="gr"><span class="gr-l">PENDENTES</span><div class="gr-t"><div class="gr-f f-G" style="width:${Math.round(pend/10*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${pend}/10</span></div>
+      <div class="gr"><span class="gr-l">CONCLUÍDOS</span><div class="gr-t"><div class="gr-f f-ok" style="width:${Math.round(done/9*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${done}/9</span></div>
+      <div class="gr"><span class="gr-l">EM ANDAMENTO</span><div class="gr-t"><div class="gr-f f-wip" style="width:${Math.round(wip/9*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${wip}/9</span></div>
+      <div class="gr"><span class="gr-l">PENDENTES</span><div class="gr-t"><div class="gr-f f-G" style="width:${Math.round(pend/9*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${pend}/9</span></div>
     </div>
   </div>`;
 
   document.getElementById('d-kpi').innerHTML=`
     <div class="kpi m"><div class="kpi-l">Total executado</div><div class="kpi-v" style="color:var(--M)">${gp}%</div><div class="kpi-h">da obra completa</div></div>
-    <div class="kpi ok"><div class="kpi-l">Concluídos</div><div class="kpi-v" style="color:var(--ok)">${done}</div><div class="kpi-h">de 10 blocos</div></div>
+    <div class="kpi ok"><div class="kpi-l">Concluídos</div><div class="kpi-v" style="color:var(--ok)">${done}</div><div class="kpi-h">de 9 blocos</div></div>
     <div class="kpi g"><div class="kpi-l">Em andamento</div><div class="kpi-v" style="color:var(--G)">${wip}</div><div class="kpi-h">blocos ativos</div></div>
     <div class="kpi"><div class="kpi-l">Pendentes</div><div class="kpi-v">${pend}</div><div class="kpi-h">não iniciados</div></div>`;
 
@@ -809,7 +769,7 @@ function rDash(){
     const p=calcPct(i), f=fc(b.st);
     return `<div style="background:#fff;border:1px solid var(--bd);border-radius:8px;padding:11px 14px;margin-bottom:7px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
       <div style="width:30px;height:30px;border-radius:6px;background:var(--M);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">${b.id}</div>
-      <div style="flex:1;min-width:120px;"><div style="font-size:13px;font-weight:700;letter-spacing:.2px;">${b.n}</div><div style="font-size:11px;color:var(--mt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${b.v}</div></div>
+      <div style="flex:1;min-width:120px;"><div style="font-size:13px;font-weight:700;">${b.n}</div><div style="font-size:11px;color:var(--mt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${b.v}</div></div>
       <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
         <div style="min-width:64px;"><div class="pt"><div class="pf ${f}" style="width:${p}%"></div></div></div>
         <span style="font-size:13px;font-weight:700;min-width:30px;text-align:right;">${p}%</span>
@@ -819,9 +779,6 @@ function rDash(){
   }).join('');
 }
 
-// Card da etapa global T no Dashboard e Etapas
-
-
 // ============================================================
 //  RENDER BLOCOS COM ETAPAS TÉCNICAS
 // ============================================================
@@ -829,13 +786,11 @@ function rBlocos(){
   document.getElementById('bl-list').innerHTML=BLOCOS.map((b,i)=>{
     const p = calcPct(i), f = fc(b.st);
     const etHtml = ETAPAS.map((e,ei) => {
-      // Ocultar etapas que não se aplicam a este bloco
-      if(e.blocos && !e.blocos.includes(i)) return '';
       const m = MED[i][ei];
       if(e.tipo === 'status'){
         const st = m.statusSimples || 'pendente';
         return `<div class="et-status-row">
-          <span class="et-num">${e.cod}</span>
+          <span class="et-num">${e.id.toString().padStart(2,'0')}</span>
           <span style="flex:1;font-size:12.5px;font-weight:500;">${e.n}</span>
           <span class="pill ${pillCls(st)}">${SL[st]}</span>
         </div>`;
@@ -846,11 +801,9 @@ function rBlocos(){
       const unit  = UNIDADE_LABEL[e.tipo];
       const col   = pct===100?'var(--ok)':pct>0?'var(--wip)':'var(--pend)';
       const stPct = pct===100?'concluido':pct>0?'andamento':'pendente';
-      const execFmt = e.tipo==='m2' ? exec.toFixed(2) : exec;
-      const totFmt  = e.tipo==='m2' ? (total>0?total.toFixed(2):'—') : (total>0?total:'—');
       return `<div class="et-row">
         <div class="et-top">
-          <span class="et-num">${e.cod}</span>
+          <span class="et-num">${e.id.toString().padStart(2,'0')}</span>
           <span class="et-nome">${e.n}</span>
           <div class="et-right">
             <span class="et-medida">${unit}</span>
@@ -860,8 +813,8 @@ function rBlocos(){
         </div>
         <div class="et-bar"><div class="et-fill" style="width:${pct}%;background:${col};opacity:.85;"></div></div>
         <div class="et-valores">
-          <span class="et-val">Executado: <strong>${execFmt} ${unit}</strong></span>
-          <span class="et-val">Total previsto: <strong>${totFmt}${total>0?' '+unit:''}</strong></span>
+          <span class="et-val">Executado: <strong>${exec} ${unit}</strong></span>
+          <span class="et-val">Total previsto: <strong>${total > 0 ? total+' '+unit : '—'}</strong></span>
         </div>
       </div>`;
     }).join('');
@@ -897,41 +850,46 @@ function tog(i){
 //  CRONOGRAMA / TIMELINE / COMUNICADOS
 // ============================================================
 function rCrono(){
-  // Limpa cache de fins contratuais para recalcular se datas mudaram
-  Object.keys(_fimCache).forEach(k=>delete _fimCache[k]);
   document.getElementById('crono-bd').innerHTML=BLOCOS.map((b,i)=>{
     const p=calcPct(i),f=fc(b.st);
-    const fimCalc = fimContratual(i).toLocaleDateString('pt-BR');
-    const pctMed = calcPct(i);
+    const fimReal   = calcFimReal(b);
+    const prazo     = statusPrazo(b);
+    const iniPrev   = new Date(b.ini+'T00:00:00').toLocaleDateString('pt-BR');
+    const iniMostra = b.iniReal ? new Date(b.iniReal+'T00:00:00').toLocaleDateString('pt-BR') : '—';
+    const fimMostra = fimReal || b.fim;
+    const diferente = b.iniReal && b.iniReal !== b.ini;
     return `<tr>
-      <td style="font-weight:700;letter-spacing:.2px;">${b.n}</td>
-      <td style="font-size:11.5px;color:var(--mt);max-width:150px;">${b.v}</td>
+      <td style="font-weight:700;">${b.n}</td>
+      <td style="font-size:11.5px;color:var(--mt);max-width:130px;">${b.v}</td>
       <td style="font-weight:600;">${b.d}</td>
-      <td>${new Date(b.ini+'T00:00:00').toLocaleDateString('pt-BR')}</td>
-      <td>${fimCalc}</td>
-      <td><span class="pill ${pillCls(b.st)}">${SL[b.st]}</span></td>
-      <td style="min-width:90px;"><div style="display:flex;align-items:center;gap:5px;"><div class="pt" style="flex:1;"><div class="pf ${f}" style="width:${pctMed}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${pctMed}%</span></div></td>
+      <td>
+        <div style="font-size:12px;font-weight:600;">${iniMostra}</div>
+        ${diferente?`<div style="font-size:10px;color:var(--mt);">Prev: ${iniPrev}</div>`:''}
+        ${!b.iniReal?`<div style="font-size:10px;color:var(--mt);">${iniPrev}</div>`:''}
+      </td>
+      <td style="font-size:12px;">${fimMostra}</td>
+      <td>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;align-items:center;">
+          <span class="pill ${pillCls(b.st)}">${SL[b.st]}</span>
+          ${prazo?`<span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;background:${prazo.bg};color:${prazo.cor};">${prazo.txt}</span>`:''}
+        </div>
+      </td>
+      <td style="min-width:90px;"><div style="display:flex;align-items:center;gap:5px;"><div class="pt" style="flex:1;"><div class="pf ${f}" style="width:${p}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${p}%</span></div></td>
     </tr>`;
   }).join('');
 }
 
-function rTL(){ document.getElementById('tl-bd').innerHTML=getTLV().map(e=>`<div class="tl-i"><div class="tl-d ${e.s}"></div><div class="tl-dt">${e.d}</div><div class="tl-h">${e.h}</div><div class="tl-p">${e.p}</div></div>`).join(''); }
+function rTL(){ document.getElementById('tl-bd').innerHTML=TLV.map(e=>`<div class="tl-i"><div class="tl-d ${e.s}"></div><div class="tl-dt">${e.d}</div><div class="tl-h">${e.h}</div><div class="tl-p">${e.p}</div></div>`).join(''); }
 
 function rCom(){
-  // Verificar se há postagem mais recente do que a última lida
-  const lastRead = localStorage.getItem('pAma_lastRead') || '';
-  const badge = document.getElementById('badge-novo');
-  if(badge && COMS.length>0){
-    const newest = COMS[0].d+'|'+COMS[0].h;
-    badge.style.display = (newest !== lastRead) ? 'inline' : 'none';
-  }
   document.getElementById('com-bd').innerHTML = COMS.map((c,i) => `
     <div class="cc ${c.t}">
       <div class="cc-meta">
+        <span class="cc-dt"><i class="ti ti-calendar" style="font-size:11px;vertical-align:-1px;"></i> ${c.d}</span>
         <span class="cc-tag" style="background:${c.t==='warn'?'var(--wip-bg)':c.t==='ok'?'var(--ok-bg)':'var(--MP)'};color:${c.t==='warn'?'var(--wip)':c.t==='ok'?'var(--ok)':'var(--M)'};">${c.t==='warn'?'ATENÇÃO':c.t==='ok'?'CONCLUSÃO':'INFORMATIVO'}</span>
       </div>
-      <div class="cc-h">${escHTML(c.h)}</div>
-      <div class="cc-p">${escHTML(c.p)}</div>
+      <div class="cc-h">${c.h}</div>
+      <div class="cc-p">${c.p}</div>
       ${c.link?`<a href="${c.link}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:7px 14px;background:var(--MP);border:1px solid var(--MB);border-radius:7px;font-size:12px;font-weight:600;color:var(--M);text-decoration:none;"><i class="ti ti-photo" style="font-size:14px;"></i> VER FOTOS DA VISTORIA</a>`:''}
     </div>`).join('');
   rAdminComs();
@@ -945,7 +903,7 @@ function rAdminComs(){
     <div style="display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--bd);flex-wrap:wrap;">
       <span style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:${c.t==='warn'?'var(--wip-bg)':c.t==='ok'?'var(--ok-bg)':'var(--MP)'};color:${c.t==='warn'?'var(--wip)':c.t==='ok'?'var(--ok)':'var(--M)'};">${c.t==='warn'?'ATENÇÃO':c.t==='ok'?'CONCLUSÃO':'INFO'}</span>
       <span style="font-size:12px;color:var(--mt);">${c.d}</span>
-      <span style="flex:1;font-size:13px;font-weight:500;">${escHTML(c.h)}</span>
+      <span style="flex:1;font-size:13px;font-weight:500;">${c.h}</span>
       ${c.link?`<i class="ti ti-link" style="font-size:13px;color:var(--G);" title="Tem link de fotos"></i>`:''}
       <button onclick="delCom(${i})" style="background:none;border:1px solid var(--err-b);color:var(--err);border-radius:6px;padding:4px 10px;cursor:pointer;font-size:12px;font-family:var(--fn);display:flex;align-items:center;gap:4px;"><i class="ti ti-trash" style="font-size:12px;"></i> APAGAR</button>
     </div>`).join('');
@@ -964,59 +922,62 @@ function chkPwd(){
   if(document.getElementById('pwd').value===PWD){
     document.getElementById('ag').style.display='none';
     document.getElementById('apanel').classList.add('on');
+    // Mostra aba Calendário para admin
+    const nbCal = document.getElementById('nb-cal');
+    if(nbCal) nbCal.style.display='inline-flex';
     renderAdminTable();
     populateSels();
     rAdminComs();
-    rCal(); // atualiza calendário com permissões de admin
-
+    rCal();
   } else {
     document.getElementById('pwd-err').textContent='Senha incorreta. Tente novamente.';
   }
 }
-function logout(){ document.getElementById('ag').style.display='block'; document.getElementById('apanel').classList.remove('on'); document.getElementById('pwd').value=''; document.getElementById('pwd-err').textContent=''; }
+function logout(){
+  document.getElementById('ag').style.display='block';
+  document.getElementById('apanel').classList.remove('on');
+  document.getElementById('pwd').value='';
+  document.getElementById('pwd-err').textContent='';
+  const nbCal = document.getElementById('nb-cal');
+  if(nbCal) nbCal.style.display='none';
+  S('dash', document.querySelector('.nb.on') || document.querySelector('.nb'));
+}
 
 // ============================================================
 //  ADMIN — STATUS DOS BLOCOS
 // ============================================================
 function renderAdminTable(){
   document.getElementById('admin-tbl-body').innerHTML=BLOCOS.map((b,i)=>
-    `<tr><td style="font-weight:700;">${b.n}</td><td style="font-size:11.5px;color:var(--mt);">${b.v.split('·')[0].trim()}</td>
-    <td><select class="st-sel" id="inp-st-${i}">${ST_OPTS.map(o=>`<option value="${o}"${b.st===o?' selected':''}>${SL[o]}</option>`).join('')}</select></td></tr>`
+    `<tr>
+      <td style="font-weight:700;">${b.n}</td>
+      <td style="font-size:11.5px;color:var(--mt);">${b.v.split('·')[0].trim()}</td>
+      <td>
+        <input type="date" id="inp-ini-${i}" value="${b.iniReal||''}"
+          style="padding:6px 8px;border:1.5px solid var(--bd);border-radius:6px;font-size:12px;font-family:var(--fn);cursor:pointer;"
+          title="Data real de início">
+      </td>
+      <td><select class="st-sel" id="inp-st-${i}">${ST_OPTS.map(o=>`<option value="${o}"${b.st===o?' selected':''}>${SL[o]}</option>`).join('')}</select></td>
+    </tr>`
   ).join('');
 }
 function salvarFirebase(){
   if(!window._fbSalvar) return;
-  // Adicionar entrada ao log de alterações (máx. 50 registros)
-  if(!window._LOG_ALT) window._LOG_ALT = [];
-  window._LOG_ALT.unshift({dt: new Date().toISOString(), u: 'engenheira'});
-  if(window._LOG_ALT.length > 50) window._LOG_ALT.length = 50;
-
   const dados = {
-    BLOCOS_ST: BLOCOS.map(b=>({pct:b.pct||0, st:b.st, iniReal:b.iniReal||null, fimReal:b.fimReal||null})),
+    BLOCOS_ST: BLOCOS.map(b=>({pct:b.pct||0, st:b.st, iniReal:b.iniReal||''})),
     MED: MED,
     CAL_MANUAL: CAL_MANUAL,
     COMS: COMS,
-    LOG: window._LOG_ALT,
   };
   window._fbSalvar(dados).catch(e=>console.warn('Firebase erro:',e));
 }
 
 function saveStatus(){
-  const hoje = new Date().toISOString().slice(0,10);
   BLOCOS.forEach((b,i)=>{
-    const novoSt = document.getElementById('inp-st-'+i).value;
-    // Registrar data real de início ao mudar para "andamento" pela primeira vez
-    if(novoSt==='andamento' && b.st!=='andamento' && !b.iniReal){
-      b.iniReal = hoje;
-    }
-    // Registrar data real de conclusão ao mudar para "concluido"
-    if(novoSt==='concluido' && b.st!=='concluido' && !b.fimReal){
-      b.fimReal = hoje;
-    }
-    b.st = novoSt;
+    b.st = document.getElementById('inp-st-'+i).value;
+    const iniInp = document.getElementById('inp-ini-'+i);
+    if(iniInp) b.iniReal = iniInp.value || '';
   });
-  Object.keys(_fimCache).forEach(k=>delete _fimCache[k]);
-  rDash(); rBlocos(); rCrono(); rTL();
+  rDash(); rBlocos(); rCrono();
   salvarFirebase();
   const m=document.getElementById('sv-status-msg');
   m.textContent='✓ STATUS ATUALIZADO — '+new Date().toLocaleTimeString('pt-BR');
@@ -1033,42 +994,35 @@ function populateSels(){
 }
 
 function rMed(){
-  var bi=parseInt(document.getElementById('a-bsel').value);
-  var wrap=document.getElementById('med-save');
+  const bi=parseInt(document.getElementById('a-bsel').value);
+  const wrap=document.getElementById('med-save');
   if(isNaN(bi)){ document.getElementById('med-body').innerHTML=''; wrap.style.display='none'; return; }
   wrap.style.display='block';
-  var html='<div style="background:var(--bg);border-radius:10px;padding:12px;">';
-  html+='<div style="font-size:10px;color:var(--mt);margin-bottom:10px;padding:8px 10px;background:#fff;border-radius:6px;border:1px solid var(--bd);">';
-  html+='<strong style="color:var(--M);">EXECUTADO</strong> = quantidade já realizada &nbsp;|&nbsp; ';
-  html+='<strong style="color:var(--G);">TOTAL</strong> = levantamento do bloco (editável conforme medição em campo)</div>';
-  ETAPAS.forEach(function(e,ei){
-    // Pular etapas que não se aplicam a este bloco
-    if(e.blocos && !e.blocos.includes(bi)) return;
-    var m=MED[bi][ei];
-    var unit=UNIDADE_LABEL[e.tipo];
-    var isDecimal=(e.tipo==='m2');
-    var step=isDecimal?'0.01':'1';
-    var badge='<span style="font-size:10px;font-weight:700;color:var(--M);background:var(--MP);border-radius:4px;padding:2px 6px;flex-shrink:0;min-width:26px;text-align:center;">'+e.cod+'</span>';
-    if(e.tipo==='status'){
-      var stVal=m.statusSimples||'pendente';
-      var opts=ST_OPTS.map(function(o){ return '<option value="'+o+'"'+(stVal===o?' selected':'')+'>'+SL[o]+'</option>'; }).join('');
-      html+='<div class="med-row">'+badge+'<span class="med-nome">'+e.n+'</span>';
-      html+='<select class="med-status-sel" id="med-st-'+bi+'-'+ei+'">'+opts+'</select></div>';
-    } else {
-      var totFmt=isDecimal?parseFloat(m.total||0).toFixed(2):(m.total||0);
-      var execFmt=isDecimal?parseFloat(m.exec||0).toFixed(2):(m.exec||0);
-      html+='<div class="med-row">'+badge+'<span class="med-nome">'+e.n+'</span>';
-      html+='<span class="med-unit">'+unit+'</span>';
-      html+='<span style="font-size:10px;color:var(--ok);font-weight:700;white-space:nowrap;">EXEC.</span>';
-      html+='<input class="med-inp" type="number" min="0" step="'+step+'" id="med-exec-'+bi+'-'+ei+'" value="'+execFmt+'" placeholder="0" style="border-color:var(--ok-b);">';
-      html+='<span class="med-sep">de</span>';
-      html+='<span style="font-size:10px;color:var(--G);font-weight:700;white-space:nowrap;">TOTAL</span>';
-      html+='<input class="med-inp" type="number" min="0" step="'+step+'" id="med-tot-'+bi+'-'+ei+'" value="'+totFmt+'" placeholder="total" style="border-color:var(--GB);"></div>';
-    }
-  });
-  html+='</div>';
-  document.getElementById('med-body').innerHTML=html;
+  document.getElementById('med-body').innerHTML=`<div style="background:var(--bg);border-radius:10px;padding:12px;">
+    ${ETAPAS.map((e,ei)=>{
+      const m=MED[bi][ei];
+      const unit=UNIDADE_LABEL[e.tipo];
+      if(e.tipo==='status'){
+        return `<div class="med-row">
+          <span style="font-size:10px;font-weight:700;color:var(--M);background:var(--MP);border-radius:4px;padding:2px 6px;flex-shrink:0;">${e.id.toString().padStart(2,'0')}</span>
+          <span class="med-nome">${e.n}</span>
+          <select class="med-status-sel" id="med-st-${bi}-${ei}">
+            ${ST_OPTS.map(o=>`<option value="${o}"${(m.statusSimples||'pendente')===o?' selected':''}>${SL[o]}</option>`).join('')}
+          </select>
+        </div>`;
+      }
+      return `<div class="med-row">
+        <span style="font-size:10px;font-weight:700;color:var(--M);background:var(--MP);border-radius:4px;padding:2px 6px;flex-shrink:0;">${e.id.toString().padStart(2,'0')}</span>
+        <span class="med-nome">${e.n}</span>
+        <span class="med-unit">${unit}</span>
+        <input class="med-inp" type="number" min="0" id="med-exec-${bi}-${ei}" value="${m.exec||0}" placeholder="0">
+        <span class="med-sep">de</span>
+        <input class="med-inp" type="number" min="0" id="med-tot-${bi}-${ei}" value="${m.total||0}" placeholder="total">
+      </div>`;
+    }).join('')}
+  </div>`;
 }
+
 function saveMed(){
   const bi=parseInt(document.getElementById('a-bsel').value);
   if(isNaN(bi)) return;
@@ -1079,19 +1033,17 @@ function saveMed(){
     } else {
       const exec=document.getElementById('med-exec-'+bi+'-'+ei);
       const tot =document.getElementById('med-tot-'+bi+'-'+ei);
-      if(exec) MED[bi][ei].exec=Math.max(0,parseFloat(exec.value)||0);
-      if(tot)  MED[bi][ei].total=Math.max(0,parseFloat(tot.value)||0);
+      if(exec) MED[bi][ei].exec=Math.max(0,parseInt(exec.value)||0);
+      if(tot)  MED[bi][ei].total=Math.max(0,parseInt(tot.value)||0);
     }
   });
-  rDash(); rBlocos(); rCrono(); rTL();
+  rDash(); rBlocos(); rCrono();
   salvarFirebase();
   const m=document.getElementById('sv-med-msg');
   m.textContent='✓ MEDIÇÕES DO BLOCO '+(bi+1)+' ATUALIZADAS — '+new Date().toLocaleTimeString('pt-BR');
   m.style.color='var(--ok)';
   setTimeout(()=>{m.textContent='';},4000);
 }
-
-
 
 // ============================================================
 //  ADMIN — COMUNICADOS
@@ -1109,9 +1061,6 @@ function addC(){
   document.getElementById('c-txt').value='';
   document.getElementById('c-link').value='';
   m.textContent='✓ COMUNICADO PUBLICADO.'; m.style.color='var(--ok)';
-  // Mostrar badge "NOVO" na aba Diário
-  const badge=document.getElementById('badge-novo');
-  if(badge){ badge.style.display='inline'; localStorage.setItem('pAma_lastRead',''); }
   setTimeout(()=>{ m.textContent=''; }, 3500);
 }
 
@@ -1139,7 +1088,7 @@ const FERIADOS_NOME = {
   '2027-09-07':'Independência do Brasil','2027-09-20':'Revolução Farroupilha'
 };
 const OBRA_INI  = new Date('2026-05-12T00:00:00');
-const OBRA_FIM  = new Date('2027-09-10T00:00:00'); // fim do Bloco 10
+const OBRA_FIM  = new Date('2027-08-19T00:00:00');
 const MESES_PT  = ['JANEIRO','FEVEREIRO','MARÇO','ABRIL','MAIO','JUNHO','JULHO','AGOSTO','SETEMBRO','OUTUBRO','NOVEMBRO','DEZEMBRO'];
 const DOWS_PT   = ['DOM','SEG','TER','QUA','QUI','SEX','SÁB'];
 
@@ -1149,19 +1098,17 @@ const CAL_MANUAL = {};
 
 let calAno = 2026, calMes = 4;
 
-// Retorna qual bloco (índice 0-8) um dia pertence pelo cronograma contratual.
-// Quando blocos se sobrepõem (ex: B2 iniciou antes de B1 terminar),
-// prevalece o bloco com data de início mais recente (maior índice).
-// Retorna -1 se fora do período de qualquer bloco.
+// Retorna qual bloco (índice 0-8) um dia pertence pelo cronograma contratual
+// Retorna -1 se fora do período
 function blocoDodia(ds){
   const d = new Date(ds+'T00:00:00');
-  let resultado = -1;
   for(let i=0;i<BLOCOS.length;i++){
     const ini = new Date(BLOCOS[i].ini+'T00:00:00');
+    // fim contratual: calcular a partir do ini + dias úteis
     const fim = fimContratual(i);
-    if(d >= ini && d <= fim) resultado = i; // sobrescreve: prevalece o último (mais recente)
+    if(d >= ini && d <= fim) return i;
   }
-  return resultado;
+  return -1;
 }
 
 // Cache dos fins contratuais calculados
@@ -1183,26 +1130,9 @@ function fimContratual(bi){
 function contarDiasPorBloco(){
   const res = BLOCOS.map(()=>({trab:0, naoTrab:0, contratual:0}));
   BLOCOS.forEach((b,i)=>{ res[i].contratual = b.d; });
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
 
-  // Percorrer cada dia passado: úteis sem marcação contam como trabalhado automaticamente
-  let c = new Date(OBRA_INI); c.setHours(0,0,0,0);
-  while(c < hoje){
-    const ds = c.toISOString().slice(0,10);
-    const dw = c.getDay();
-    const bi = blocoDodia(ds);
-    if(bi >= 0){
-      const manual = CAL_MANUAL[ds];
-      if(manual === 'trabalhado')          res[bi].trab++;
-      else if(manual === 'nao_trabalhado') res[bi].naoTrab++;
-      else if(dw > 0 && dw < 6 && !FERIADOS_SET.has(ds)) res[bi].trab++; // automático
-    }
-    c.setDate(c.getDate()+1);
-  }
-  // Dias futuros — só marcações explícitas antecipadas
+  // Apenas dias marcados explicitamente
   Object.entries(CAL_MANUAL).forEach(([ds, estado])=>{
-    const d = new Date(ds+'T00:00:00'); d.setHours(0,0,0,0);
-    if(d < hoje) return; // já processado no loop acima
     const bi = blocoDodia(ds);
     if(bi < 0) return;
     if(estado === 'trabalhado')          res[bi].trab++;
@@ -1247,53 +1177,23 @@ function rCalIndicadores(){
   const pctGlobal    = Math.round((totalTrab/totalContrat)*100);
   const atrasoBlocos = dados.filter((d,i)=>d.trab+d.naoTrab>0 && d.trab+d.naoTrab > d.contratual).length;
 
-  // Projeta data de conclusão:
-  // Conta os dias úteis que ainda restam no cronograma contratual de cada bloco
-  // (dias dentro do período previsto que ainda não foram marcados como trabalhados),
-  // depois soma a partir de hoje para encontrar a data projetada.
-  // Se todos os dias já foram marcados ou a obra concluiu, mostra a data contratual.
+  // Projeta data de conclusão com base no ritmo atual
   let projecao = '—';
-  const hoje_proj = new Date(); hoje_proj.setHours(0,0,0,0);
-  let diasRestantes = 0;
-  BLOCOS.forEach(function(b, i){
-    const ini = new Date(b.ini+'T00:00:00');
-    const fim = fimContratual(i);
-    // Percorrer apenas os dias futuros dentro do período do bloco
-    const start = new Date(Math.max(hoje_proj.getTime(), ini.getTime()));
-    let cc = new Date(start);
-    while(cc <= fim){
-      const dw=cc.getDay(), ds=cc.toISOString().slice(0,10);
-      // Conta dia útil que ainda não foi marcado como trabalhado
-      if(dw>0&&dw<6&&!FERIADOS_SET.has(ds)&&CAL_MANUAL[ds]!=='trabalhado') diasRestantes++;
-      cc.setDate(cc.getDate()+1);
-    }
-  });
-  // Só exibe projeção quando há pelo menos uma marcação (trabalhado ou não trabalhado)
-  if((totalTrab + totalNao) > 0){
-    // Projeção = hoje + dias futuros restantes do cronograma + dias não trabalhados (atraso a repor)
-    // diasRestantes = dias úteis futuros do cronograma ainda não marcados como trabalhados
-    // totalNao      = dias explicitamente perdidos que precisam ser repostos ao final
-    const totalAvançar = diasRestantes + totalNao;
-    let c = new Date(hoje_proj);
+  if(totalTrab > 0){
+    const diasRestContrat = totalContrat - totalTrab;
+    // data de hoje + dias restantes em dias úteis
+    let c = new Date(); c.setHours(0,0,0,0);
     let cont = 0;
-    while(cont < totalAvançar){
+    while(cont < diasRestContrat){
       c.setDate(c.getDate()+1);
       const dw=c.getDay(), ds=c.toISOString().slice(0,10);
       if(dw>0&&dw<6&&!FERIADOS_SET.has(ds)) cont++;
     }
-    // A projeção NUNCA pode ultrapassar a data contratual (fim do último bloco).
-    // Se ultrapassar, exibe a data contratual com indicador de risco.
-    const dataContratual = fimContratual(BLOCOS.length-1);
-    if(c > dataContratual){
-      projecao = dataContratual.toLocaleDateString('pt-BR');
-    } else {
-      projecao = c.toLocaleDateString('pt-BR');
-    }
+    projecao = c.toLocaleDateString('pt-BR');
   }
 
-  // Status público — exibe apenas NO PRAZO ou EM ANDAMENTO, sem alarmes
-  const statusCor = totalTrab > 0 ? 'var(--ok)' : 'var(--mt)';
-  const statusTxt = totalTrab > 0 ? 'NO PRAZO' : 'OBRA NÃO INICIADA';
+  const statusCor = atrasoBlocos > 0 ? 'var(--err)' : totalTrab > 0 ? 'var(--ok)' : 'var(--mt)';
+  const statusTxt = atrasoBlocos > 0 ? `${atrasoBlocos} BLOCO(S) COM DIAS EXCEDIDOS` : totalTrab > 0 ? 'NO PRAZO' : 'OBRA NÃO INICIADA';
 
   let html = `<div style="background:#fff;border:1px solid var(--bd);border-radius:10px;padding:16px;margin-bottom:4px;">
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mt);margin-bottom:12px;">CONTROLE GLOBAL DA OBRA</div>
@@ -1311,43 +1211,34 @@ function rCalIndicadores(){
       <div style="text-align:center;padding:10px;background:var(--GP);border:1px solid var(--GB);border-radius:8px;">
         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--G);">Projeção conclusão</div>
         <div style="font-size:16px;font-weight:700;color:var(--G);margin-top:4px;">${projecao}</div>
-        <div style="font-size:11px;color:var(--G);">Contratual: 10/09/2027</div>
+        <div style="font-size:11px;color:var(--G);">Contratual: 19/08/2027</div>
       </div>
-      <div style="text-align:center;padding:10px;background:var(--pend-bg);border:1px solid var(--pend-b);border-radius:8px;">
+      <div style="text-align:center;padding:10px;background:${atrasoBlocos>0?'var(--err-bg)':'var(--pend-bg)'};border:1px solid ${atrasoBlocos>0?'var(--err-b)':'var(--pend-b)'};border-radius:8px;">
         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:${statusCor};">Status</div>
         <div style="font-size:12px;font-weight:700;color:${statusCor};margin-top:6px;">${statusTxt}</div>
       </div>
     </div>
     <div style="margin-bottom:6px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--mt);">AVANÇO POR BLOCO</div>
-    ${(function(){
-      var html='';
-      var hoje=new Date(); hoje.setHours(0,0,0,0);
-      dados.forEach(function(d,i){
-        var b=BLOCOS[i];
-        var iniBloco=new Date(b.ini+'T00:00:00');
-        var jaIniciou=iniBloco<=hoje;
-        if(!jaIniciou) return;
-        var pct=Math.min(Math.round((d.trab/d.contratual)*100),100);
-        var excedeu=d.trab>d.contratual;
-        var semMarcacao=d.trab===0&&d.naoTrab===0;
-        var cor=excedeu?'var(--err)':semMarcacao?'var(--wip)':d.trab>0?'var(--ok)':'var(--pend)';
-        var fillCor=excedeu?'#dc2626':semMarcacao?'#e8d0db':d.trab>0?'#2d7a3a':'#d8d4cf';
-        var labelDir=excedeu?pct+'% ⚠':semMarcacao?'Iniciado':pct+'%';
-        var subTxt=semMarcacao
-          ?'Iniciado em '+iniBloco.toLocaleDateString('pt-BR')+' — marque os dias no Calendário'
-          :d.trab+' / '+d.contratual+' dias marcados'+(d.naoTrab>0?' · '+d.naoTrab+' não trabalhados':'');
-        var bgNum=semMarcacao?'var(--wip)':'var(--M)';
-        var barW=semMarcacao?5:Math.min(pct,100);
-        html+='<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--bd);flex-wrap:wrap;">';
-        html+='<div style="width:28px;height:28px;border-radius:5px;background:'+bgNum+';color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">'+(i+1)+'</div>';
-        html+='<div style="min-width:80px;flex:1;"><div style="font-size:11px;font-weight:700;">'+b.n+'</div>';
-        html+='<div style="font-size:10px;color:var(--mt);">'+subTxt+'</div></div>';
-        html+='<div style="min-width:100px;flex:1;"><div style="height:6px;background:#f0ece6;border-radius:3px;overflow:hidden;">';
-        html+='<div style="height:100%;border-radius:3px;background:'+fillCor+';width:'+barW+'%;transition:width .5s;"></div></div></div>';
-        html+='<span style="font-size:12px;font-weight:700;color:'+cor+';min-width:54px;text-align:right;">'+labelDir+'</span></div>';
-      });
-      return html;
-    })()}
+    ${dados.map((d,i)=>{
+      if(d.trab+d.naoTrab===0 && !BLOCOS[i].ini) return '';
+      const pct = Math.min(Math.round((d.trab/d.contratual)*100),100);
+      const excedeu = d.trab > d.contratual;
+      const cor = excedeu?'var(--err)':d.trab>0?'var(--ok)':'var(--pend)';
+      const fillCor = excedeu?'#dc2626':d.trab>0?'#2d7a3a':'#d8d4cf';
+      return `<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--bd);flex-wrap:wrap;">
+        <div style="width:28px;height:28px;border-radius:5px;background:var(--M);color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;">${i+1}</div>
+        <div style="min-width:80px;flex:1;">
+          <div style="font-size:11px;font-weight:700;">${BLOCOS[i].n}</div>
+          <div style="font-size:10px;color:var(--mt);">${d.trab} / ${d.contratual} dias do cronograma${d.naoTrab>0?' · '+d.naoTrab+' não trabalhados':''}</div>
+        </div>
+        <div style="min-width:100px;flex:1;">
+          <div style="height:6px;background:#f0ece6;border-radius:3px;overflow:hidden;">
+            <div style="height:100%;border-radius:3px;background:${fillCor};width:${Math.min(pct,100)}%;transition:width .5s;"></div>
+          </div>
+        </div>
+        <span style="font-size:12px;font-weight:700;color:${cor};min-width:38px;text-align:right;">${pct}%${excedeu?' ⚠':''}</span>
+      </div>`;
+    }).join('')}
   </div>`;
 
   document.getElementById('cal-indicadores').innerHTML = html;
@@ -1457,12 +1348,6 @@ function S(id,b){
   if(b)b.classList.add('on');
   // Rechama rCal ao abrir o calendário para aplicar permissões de admin
   if(id==='cal') rCal();
-  // Ao abrir o Diário, esconder o badge e registrar leitura
-  if(id==='com'){
-    const badge=document.getElementById('badge-novo');
-    if(badge) badge.style.display='none';
-    if(COMS.length>0) localStorage.setItem('pAma_lastRead', COMS[0].d+'|'+COMS[0].h);
-  }
 }
 
 function irDiario(){
@@ -1486,24 +1371,11 @@ rDash(); rBlocos(); rCrono(); rTL(); rCom(); rCal(); initQR();
 window.addEventListener('load', ()=>{
   if(window._fbCarregar){
     window._fbCarregar(dados => {
-      if(dados.BLOCOS_ST) dados.BLOCOS_ST.forEach((s,i)=>{ if(BLOCOS[i] && s){ BLOCOS[i].pct=s.pct||0; if(ST_OPTS.includes(s.st)) BLOCOS[i].st=s.st; if(s.iniReal) BLOCOS[i].iniReal=s.iniReal; if(s.fimReal) BLOCOS[i].fimReal=s.fimReal; } });
-      if(dados.MED) dados.MED.forEach(function(bloco,bi){
-        if(!bloco || !MED[bi]) return;
-        bloco.forEach(function(et,ei){
-          if(!MED[bi][ei] || !et) return;
-          // Carrega apenas exec e statusSimples do Firebase.
-          // O total NUNCA é sobrescrito com zero — mantém o levantamento inicial do código,
-          // a menos que o Firebase tenha um valor maior que zero (edição manual da engenheira).
-          if(typeof et.exec === 'number')             MED[bi][ei].exec = et.exec;
-          if(typeof et.statusSimples === 'string')    MED[bi][ei].statusSimples = et.statusSimples;
-          if(typeof et.total === 'number' && et.total > 0) MED[bi][ei].total = et.total;
-        });
-      });
+      if(dados.BLOCOS_ST) dados.BLOCOS_ST.forEach((s,i)=>{ if(BLOCOS[i]){ BLOCOS[i].pct=s.pct||0; BLOCOS[i].st=s.st||BLOCOS[i].st; BLOCOS[i].iniReal=s.iniReal||BLOCOS[i].iniReal||''; } });
+      if(dados.MED) dados.MED.forEach((bloco,bi)=>{ if(bloco) bloco.forEach((et,ei)=>{ if(MED[bi]&&MED[bi][ei]&&et) Object.assign(MED[bi][ei],et); }); });
       if(dados.CAL_MANUAL) Object.assign(CAL_MANUAL, dados.CAL_MANUAL);
       if(dados.COMS && dados.COMS.length){ COMS.length=0; dados.COMS.forEach(c=>COMS.push(c)); }
-      if(dados.LOG && Array.isArray(dados.LOG)) window._LOG_ALT = dados.LOG;
-      Object.keys(_fimCache).forEach(k=>delete _fimCache[k]);
-      rDash(); rBlocos(); rCrono(); rTL(); rCom(); rCal();
+      rDash(); rBlocos(); rCrono(); rCom(); rCal();
     });
   }
 });
