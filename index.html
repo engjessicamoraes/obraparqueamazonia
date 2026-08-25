@@ -591,15 +591,16 @@ const UNIDADE_LABEL = {m2:'m²', un:'un', status:'—'};
 //  BLOCOS — datas calculadas em dias úteis (sem sábado/domingo/feriados POA)
 // ============================================================
 const BLOCOS = [
-  {id:1, n:'BLOCO 1', v:'Box 68 ao Box 73',                                            d:25, ini:'2026-05-12', fim:'16/06/2026', st:'andamento', iniReal:'2026-05-12'},
-  {id:2, n:'BLOCO 2', v:'Box 74 ao Box 03 · Transformador · Almoxarifado Gilmar',      d:35, ini:'2026-06-17', fim:'04/08/2026', st:'pendente',  iniReal:''},
-  {id:3, n:'BLOCO 3', v:'Box 04 ao Box 13',                                            d:25, ini:'2026-08-05', fim:'09/09/2026', st:'pendente',  iniReal:''},
-  {id:4, n:'BLOCO 4', v:'Box 14 ao Box 22',                                            d:35, ini:'2026-09-10', fim:'29/10/2026', st:'pendente',  iniReal:''},
-  {id:5, n:'BLOCO 5', v:'Box 23 ao Box 32',                                            d:40, ini:'2026-10-30', fim:'29/12/2026', st:'pendente',  iniReal:''},
-  {id:6, n:'BLOCO 6', v:'Box 33 ao Box 44',                                            d:40, ini:'2026-12-30', fim:'01/03/2027', st:'pendente',  iniReal:''},
-  {id:7, n:'BLOCO 7', v:'Box 45 ao Box 52 · Duplo até o fundo',                        d:35, ini:'2027-03-02', fim:'20/04/2027', st:'pendente',  iniReal:''},
-  {id:8, n:'BLOCO 8', v:'Box 53 ao Box 60 · Box 61 ao lado do Portão 1 (P1)',          d:35, ini:'2027-04-22', fim:'10/06/2027', st:'pendente',  iniReal:''},
-  {id:9, n:'BLOCO 9', v:'Box 62, 63, 64 ao 67',                                        d:50, ini:'2027-06-11', fim:'19/08/2027', st:'pendente',  iniReal:''},
+  {id:1, n:'BLOCO 1', v:'Box 68 ao Box 73',                                            d:25, ini:'2026-05-12', fim:'16/06/2026', st:'concluido', iniReal:'2026-05-12'},
+  {id:2, n:'BLOCO 2', v:'Box 74 ao Box 03 · Transformador · Almoxarifado Gilmar',      d:35, ini:'2026-06-17', fim:'04/08/2026', st:'concluido', iniReal:''},
+  {id:3, n:'BLOCO 3', v:'Box 04 ao Box 13',                                            d:25, ini:'2026-08-05', fim:'09/09/2026', st:'concluido', iniReal:''},
+  {id:4, n:'BLOCO 4', v:'Box 14 ao Box 22',                                            d:35, ini:'2026-09-10', fim:'29/10/2026', st:'concluido', iniReal:''},
+  {id:5, n:'BLOCO 5', v:'Box 23 ao Box 32',                                            d:40, ini:'2026-10-30', fim:'29/12/2026', st:'concluido', iniReal:''},
+  {id:6, n:'BLOCO 6', v:'Box 33 ao Box 44',                                            d:40, ini:'2026-12-30', fim:'01/03/2027', st:'concluido', iniReal:''},
+  {id:7, n:'BLOCO 7', v:'Box 42 ao Box 52 · 7 vagas simples e 1 vaga dupla',           d:10, ini:'2026-08-24', fim:'04/09/2026', st:'andamento', iniReal:'2026-08-24'},
+  {id:8, n:'BLOCO 8', v:'Box 53 ao Box 60 · 7 vagas simples e 1 vaga dupla',           d:10, ini:'2026-09-08', fim:'21/09/2026', st:'pendente',  iniReal:''},
+  {id:9, n:'BLOCO 9', v:'Box 62 ao Box 67',                                            d:10, ini:'2026-09-22', fim:'05/10/2026', st:'pendente',  iniReal:''},
+  {id:10,n:'BLOCO 10',v:'Demarcação da rota de circulação de pedestres/carrinhos',              d:10, ini:'2026-10-06', fim:'20/10/2026', st:'pendente',  iniReal:''},
 ];
 
 // Calcula a data de término real a partir do início real + dias úteis do contrato
@@ -626,10 +627,40 @@ function statusPrazo(b){
   return           {txt: 'No prazo',                          cor:'var(--G)',   bg:'var(--GP)'};
 }
 
+// ============================================================
+//  CASCATA DE PRAZOS — ao concluir um bloco, calcula o início
+//  real do próximo automaticamente (próximo dia útil)
+// ============================================================
+const FERIADOS_POA = ['2026-06-04','2026-09-07','2026-09-20','2026-10-12','2026-11-02','2026-11-15','2026-11-20','2026-12-25','2027-01-01','2027-02-02','2027-02-15','2027-02-16','2027-04-02','2027-04-21','2027-05-01','2027-06-03','2027-09-07','2027-09-20'];
+function ehDiaUtil(d){
+  const dw=d.getDay(), ds=d.toISOString().slice(0,10);
+  return dw>0 && dw<6 && !FERIADOS_POA.includes(ds);
+}
+function somarDiasUteis(iniISO, dias){
+  let c=new Date(iniISO+'T00:00:00'), cont=0;
+  while(cont<dias){ if(ehDiaUtil(c)) cont++; if(cont<dias) c.setDate(c.getDate()+1); }
+  return c;
+}
+function proximoDiaUtil(d){
+  let c=new Date(d); c.setDate(c.getDate()+1);
+  while(!ehDiaUtil(c)) c.setDate(c.getDate()+1);
+  return c;
+}
+
 // Estado das medições: [blocoIdx][etapaIdx] = {total, exec, statusSimples}
 const MED = BLOCOS.map(() =>
   ETAPAS.map(e => e.tipo === 'status' ? {statusSimples:'pendente'} : {total:0, exec:0})
 );
+
+// Blocos 1 a 6 já concluídos — todas as etapas marcadas em 100%
+// (totais em 100 como referência de proporção; ajuste pelas quantidades reais
+// no painel "Medições por etapa" quando disponíveis)
+[0,1,2,3,4,5].forEach(bi=>{
+  ETAPAS.forEach((e,ei)=>{
+    if(e.tipo==='status'){ MED[bi][ei].statusSimples='concluido'; }
+    else { MED[bi][ei].total=100; MED[bi][ei].exec=100; }
+  });
+});
 
 const ST_OPTS  = ['concluido','andamento','pendente','aguardando','atraso'];
 const SL       = {concluido:'CONCLUÍDO', andamento:'EM ANDAMENTO', pendente:'NÃO INICIADO', aguardando:'AGUARDANDO', atraso:'COM ATRASO'};
@@ -640,16 +671,13 @@ let COMS  = [
   {t:'info', d:'12/05/2026', h:'Início da obra — Bloco 1', p:'Os serviços de recuperação estrutural e pintura foram iniciados no Bloco 1 (Box 68 ao Box 73). O canteiro de obras está mobilizado e os trabalhos ocorrem dentro do horário regulamentar, de segunda a sexta-feira.', link:'https://drive.google.com/drive/folders/1BdujKSWLtzJo__2ksdeapzdGUGE42sqH?usp=drive_link'},
 ];
 const TLV = [
-  {s:'wip',  d:'MAI 2026', h:'Início da obra — Bloco 1',   p:'Mobilização da equipe. Início dos serviços de recuperação estrutural e revestimento nos Box 68 ao Box 73.'},
-  {s:'fut',  d:'JUN 2026', h:'Início previsto — Bloco 2',  p:'Box 74 ao Box 03 · Transformador · Almoxarifado Gilmar. Previsão: 17/06/2026.'},
-  {s:'fut',  d:'AGO 2026', h:'Início previsto — Bloco 3',  p:'Box 04 ao Box 13. Previsão: 06/08/2026.'},
-  {s:'fut',  d:'SET 2026', h:'Início previsto — Bloco 4',  p:'Box 14 ao Box 22. Previsão: 11/09/2026.'},
-  {s:'fut',  d:'NOV 2026', h:'Início previsto — Bloco 5',  p:'Box 23 ao Box 32. Previsão: 03/11/2026.'},
-  {s:'fut',  d:'DEZ 2026', h:'Início previsto — Bloco 6',  p:'Box 33 ao Box 44. Previsão: 31/12/2026.'},
-  {s:'fut',  d:'MAR 2027', h:'Início previsto — Bloco 7',  p:'Box 45 ao Box 52 · Duplo até o fundo. Previsão: 02/03/2027.'},
-  {s:'fut',  d:'ABR 2027', h:'Início previsto — Bloco 8',  p:'Box 53 ao Box 60 · Box 61. Previsão: 22/04/2027.'},
-  {s:'fut',  d:'JUN 2027', h:'Início previsto — Bloco 9',  p:'Box 62 ao Box 67. Previsão: 11/06/2027.'},
-  {s:'fut',  d:'AGO 2027', h:'Previsão de conclusão geral', p:'Entrega final com todos os blocos concluídos. Data prevista: 19/08/2027.'},
+  {s:'done', d:'MAI 2026', h:'Início da obra — Bloco 1',    p:'Mobilização da equipe. Início dos serviços de recuperação estrutural e revestimento nos Box 68 ao Box 73.'},
+  {s:'done', d:'2026', h:'Blocos 1 a 6 concluídos', p:'Recuperação estrutural e pintura concluídas nos Blocos 1 a 6 (Box 68 ao Box 03, Transformador, Almoxarifado Gilmar e Box 04 ao Box 44).'},
+  {s:'wip',  d:'AGO 2026', h:'Início da obra — Bloco 7',    p:'Box 42 ao Box 52 · 7 vagas simples e 1 vaga dupla. Início: 24/08/2026.'},
+  {s:'fut',  d:'SET 2026', h:'Início previsto — Bloco 8',   p:'Box 53 ao Box 60 · 7 vagas simples e 1 vaga dupla. Previsão: 08/09/2026.'},
+  {s:'fut',  d:'SET 2026', h:'Início previsto — Bloco 9',   p:'Box 62 ao Box 67. Previsão: 22/09/2026.'},
+  {s:'fut',  d:'OUT 2026', h:'Início previsto — Bloco 10',  p:'Demarcação da rota de circulação de pedestres/carrinhos. Previsão: 06/10/2026.'},
+  {s:'fut',  d:'OUT 2026', h:'Previsão de conclusão geral', p:'Entrega final com todos os blocos concluídos. Data prevista: 20/10/2026.'},
 ];
 
 // ============================================================
@@ -742,7 +770,7 @@ function rDash(){
       <div style="font-size:14px;font-weight:600;color:var(--tx);">${nomes}</div>
       <div style="font-size:12px;color:var(--mt);margin-top:3px;">Serviços iniciados em ${ini} · ${wipBlocos[0].d} dias úteis previstos</div>
     </div>`;
-  } else if(done === 9){
+  } else if(done === BLOCOS.length){
     contexto = `<div style="background:var(--ok-bg);border:1px solid var(--ok-b);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:14px;font-weight:600;color:var(--ok);"><i class="ti ti-check"></i> Obra concluída com sucesso.</div>`;
   } else {
     contexto = `<div style="background:var(--pend-bg);border:1px solid var(--pend-b);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:var(--pend);">Obra ainda não iniciada.</div>`;
@@ -753,15 +781,15 @@ function rDash(){
   document.getElementById('d-gpc').innerHTML=`<div class="gpc">
     <div class="gpc-ring"><svg width="88" height="88" viewBox="0 0 90 90"><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#f0ece6" stroke-width="7"/><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#5C2444" stroke-width="7" stroke-dasharray="${da} ${ci.toFixed(1)}" stroke-linecap="round"/></svg><div class="gpc-n"><span>${gp}%</span><small>GLOBAL</small></div></div>
     <div class="gpc-rows">
-      <div class="gr"><span class="gr-l">CONCLUÍDOS</span><div class="gr-t"><div class="gr-f f-ok" style="width:${Math.round(done/9*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${done}/9</span></div>
-      <div class="gr"><span class="gr-l">EM ANDAMENTO</span><div class="gr-t"><div class="gr-f f-wip" style="width:${Math.round(wip/9*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${wip}/9</span></div>
-      <div class="gr"><span class="gr-l">PENDENTES</span><div class="gr-t"><div class="gr-f f-G" style="width:${Math.round(pend/9*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${pend}/9</span></div>
+      <div class="gr"><span class="gr-l">CONCLUÍDOS</span><div class="gr-t"><div class="gr-f f-ok" style="width:${Math.round(done/BLOCOS.length*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${done}/${BLOCOS.length}</span></div>
+      <div class="gr"><span class="gr-l">EM ANDAMENTO</span><div class="gr-t"><div class="gr-f f-wip" style="width:${Math.round(wip/BLOCOS.length*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${wip}/${BLOCOS.length}</span></div>
+      <div class="gr"><span class="gr-l">PENDENTES</span><div class="gr-t"><div class="gr-f f-G" style="width:${Math.round(pend/BLOCOS.length*100)}%"></div></div><span style="font-size:11px;font-weight:600;min-width:26px;">${pend}/${BLOCOS.length}</span></div>
     </div>
   </div>`;
 
   document.getElementById('d-kpi').innerHTML=`
     <div class="kpi m"><div class="kpi-l">Total executado</div><div class="kpi-v" style="color:var(--M)">${gp}%</div><div class="kpi-h">da obra completa</div></div>
-    <div class="kpi ok"><div class="kpi-l">Concluídos</div><div class="kpi-v" style="color:var(--ok)">${done}</div><div class="kpi-h">de 9 blocos</div></div>
+    <div class="kpi ok"><div class="kpi-l">Concluídos</div><div class="kpi-v" style="color:var(--ok)">${done}</div><div class="kpi-h">de ${BLOCOS.length} blocos</div></div>
     <div class="kpi g"><div class="kpi-l">Em andamento</div><div class="kpi-v" style="color:var(--G)">${wip}</div><div class="kpi-h">blocos ativos</div></div>
     <div class="kpi"><div class="kpi-l">Pendentes</div><div class="kpi-v">${pend}</div><div class="kpi-h">não iniciados</div></div>`;
 
@@ -972,17 +1000,38 @@ function salvarFirebase(){
 }
 
 function saveStatus(){
+  const statusAntigo = BLOCOS.map(b=>b.st);
   BLOCOS.forEach((b,i)=>{
     b.st = document.getElementById('inp-st-'+i).value;
     const iniInp = document.getElementById('inp-ini-'+i);
     if(iniInp) b.iniReal = iniInp.value || '';
   });
+
+  // Cascata: bloco recém-concluído dispara o início real do próximo bloco
+  // (próximo dia útil após o término), caso o próximo ainda não tenha começado
+  let cascatas = [];
+  BLOCOS.forEach((b,i)=>{
+    const acabouDeConcluir = b.st==='concluido' && statusAntigo[i]!=='concluido';
+    const prox = BLOCOS[i+1];
+    if(acabouDeConcluir && prox && !prox.iniReal){
+      const base = b.iniReal || b.ini;
+      const fimBase = somarDiasUteis(base, b.d);
+      const proxIni = proximoDiaUtil(fimBase);
+      prox.iniReal = proxIni.toISOString().slice(0,10);
+      if(prox.st==='pendente') prox.st='andamento';
+      cascatas.push(prox.n);
+    }
+  });
+
+  renderAdminTable();
   rDash(); rBlocos(); rCrono();
   salvarFirebase();
   const m=document.getElementById('sv-status-msg');
-  m.textContent='✓ STATUS ATUALIZADO — '+new Date().toLocaleTimeString('pt-BR');
+  m.textContent = cascatas.length
+    ? '✓ STATUS ATUALIZADO — início de '+cascatas.join(', ')+' definido automaticamente — '+new Date().toLocaleTimeString('pt-BR')
+    : '✓ STATUS ATUALIZADO — '+new Date().toLocaleTimeString('pt-BR');
   m.style.color='var(--ok)';
-  setTimeout(()=>{m.textContent='';},4000);
+  setTimeout(()=>{m.textContent='';},6000);
 }
 
 // ============================================================
