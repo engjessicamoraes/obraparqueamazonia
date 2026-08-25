@@ -740,8 +740,8 @@ function rDash(){
     contexto = `<div style="background:#fff;border:1px solid var(--bd);border-left:4px solid var(--wip);border-radius:10px;padding:14px 16px;margin-bottom:16px;">
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--wip);margin-bottom:4px;"><i class="ti ti-player-play" style="font-size:11px;vertical-align:-1px;"></i> EM EXECUÇÃO</div>
       <div style="font-size:14px;font-weight:600;color:var(--tx);">${nomes}</div>
-      <div style="font-size:12px;color:var(--mt);margin-top:3px;">Serviços iniciados em ${ini} · ${b.d} dias úteis previstos</div>
-    </div>`.replace('b.d', wipBlocos[0].d);
+      <div style="font-size:12px;color:var(--mt);margin-top:3px;">Serviços iniciados em ${ini} · ${wipBlocos[0].d} dias úteis previstos</div>
+    </div>`;
   } else if(done === 9){
     contexto = `<div style="background:var(--ok-bg);border:1px solid var(--ok-b);border-radius:10px;padding:14px 16px;margin-bottom:16px;font-size:14px;font-weight:600;color:var(--ok);"><i class="ti ti-check"></i> Obra concluída com sucesso.</div>`;
   } else {
